@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/Components/ui/button";
+import { Textarea } from "@/Components/ui/textarea";
 import { Send } from "lucide-react";
 
 export default function MessageComposer({ onSend, disabled = false }) {

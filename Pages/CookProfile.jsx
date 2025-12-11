@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { mockApi } from '../mockApi';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/Components/ui/button";
+import { Card, CardContent } from "@/Components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { ChefHat, Star, ArrowLeft, Utensils, MessageSquare, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import RatingStars from "@/components/reviews/RatingStars";
-import ReviewCard from "@/components/reviews/ReviewCard";
-import MealCard from "@/components/meals/MealCard";
-import MealDetailsModal from "@/components/meals/MealDetailsModal";
-import MealRequestModal from "@/components/meals/MealRequestModal";
+import RatingStars from "@/Components/reviews/RatingStars";
+import ReviewCard from "@/Components/reviews/ReviewCard";
+import MealCard from "@/Components/meals/MealCard";
+import MealDetailsModal from "@/Components/meals/MealDetailsModal";
+import MealRequestModal from "@/Components/meals/MealRequestModal";
 import { getStoredUser, DEMO_USER } from '../auth';
 
 export default function CookProfile() {

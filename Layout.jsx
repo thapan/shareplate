@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { mockApi } from './mockApi';
 import { DEMO_USER, getStoredUser, setStoredUser } from './auth';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/Components/ui/dropdown-menu";
 import { ChefHat, User, LogOut, Utensils, Menu, X, Users, MessageSquare } from "lucide-react";
 
 export default function Layout({ children }) {

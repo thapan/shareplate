@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { mockApi } from '../mockApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { ChefHat, MessageSquare, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import ConversationList from "@/components/messages/ConversationList";
-import MessageThread from "@/components/messages/MessageThread";
-import MessageComposer from "@/components/messages/MessageComposer";
+import { Button } from "@/Components/ui/button";
+import ConversationList from "@/Components/messages/ConversationList";
+import MessageThread from "@/Components/messages/MessageThread";
+import MessageComposer from "@/Components/messages/MessageComposer";
 import { getStoredUser, DEMO_USER } from '../auth';
 
 export default function Messages() {

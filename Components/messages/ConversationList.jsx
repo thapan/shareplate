@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/Components/ui/card";
+import { Badge } from "@/Components/ui/badge";
 import { User, ChefHat } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 

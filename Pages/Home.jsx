@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { mockApi } from '../mockApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@/Components/ui/sheet";
+import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Plus, Search, Utensils, Calendar, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import MealCard from "@/components/meals/MealCard";
-import MealRequestModal from "@/components/meals/MealRequestModal";
-import MealDetailsModal from "@/components/meals/MealDetailsModal";
-import CreateMealForm from "@/components/meals/CreateMealForm";
+import MealCard from "@/Components/meals/MealCard";
+import MealRequestModal from "@/Components/meals/MealRequestModal";
+import MealDetailsModal from "@/Components/meals/MealDetailsModal";
+import CreateMealForm from "@/Components/meals/CreateMealForm";
 import { DEMO_USER, getStoredUser, setStoredUser } from '../auth';
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/Components/ui/badge";
 
 export default function Home() {
   const [user, setUser] = useState(() => getStoredUser());

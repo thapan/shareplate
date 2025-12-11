@@ -5,11 +5,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+} from "@/Components/ui/dialog";
+import { Button } from "@/Components/ui/button";
+import { Textarea } from "@/Components/ui/textarea";
+import { Label } from "@/Components/ui/label";
+import { Input } from "@/Components/ui/input";
 import { Calendar, Clock, MapPin, ChefHat, Minus, Plus } from "lucide-react";
 import { format } from "date-fns";
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Card } from "@/components/ui/card";
+import { Card } from "@/Components/ui/card";
 import { format } from "date-fns";
 import { Check, CheckCheck } from "lucide-react";
 

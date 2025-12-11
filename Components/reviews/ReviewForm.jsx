@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/Components/ui/button";
+import { Textarea } from "@/Components/ui/textarea";
+import { Label } from "@/Components/ui/label";
 import { Star } from 'lucide-react';
 import { cn } from "@/lib/utils";
 

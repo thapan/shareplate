@@ -4,16 +4,16 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@/Components/ui/dialog";
+import { Button } from "@/Components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Calendar, Clock, MapPin, ChefHat, Users, Star } from "lucide-react";
 import { format } from "date-fns";
 import { useQuery } from '@tanstack/react-query';
 import { mockApi } from '../../mockApi';
 import RatingStars from "../reviews/RatingStars";
 import ReviewCard from "../reviews/ReviewCard";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/Components/ui/badge";
 
 const dietaryColors = {
   "vegetarian": "bg-emerald-50 text-emerald-700 border-emerald-200",

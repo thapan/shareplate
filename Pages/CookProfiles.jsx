@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { mockApi } from '../mockApi';
 import { useQuery } from '@tanstack/react-query';
-import { Input } from "@/components/ui/input";
+import { Input } from "@/Components/ui/input";
 import { Search, ChefHat } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import CookProfileCard from "@/components/cooks/CookProfileCard";
+import CookProfileCard from "@/Components/cooks/CookProfileCard";
 
 export default function CookProfiles() {
   const [searchQuery, setSearchQuery] = useState("");
