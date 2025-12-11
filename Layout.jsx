@@ -11,7 +11,79 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
-import { ChefHat, User, LogOut, Utensils, Menu, X, Users, MessageSquare, HelpingHand } from "lucide-react";
+import { ChefHat, User, LogOut, Utensils, Menu, X, Users, MessageSquare } from "lucide-react";
+
+function LogoMark({ size = 44 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="drop-shadow-sm"
+    >
+      <defs>
+        <linearGradient id="plateGradient" x1="12" y1="10" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#f97316" />
+          <stop offset="1" stopColor="#f59e0b" />
+        </linearGradient>
+        <linearGradient id="bowlGradient" x1="20" y1="36" x2="44" y2="46" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#fef3c7" />
+          <stop offset="1" stopColor="#fcd34d" />
+        </linearGradient>
+      </defs>
+      <circle cx="32" cy="32" r="30" fill="url(#plateGradient)" />
+      <circle cx="32" cy="32" r="20" fill="#fff7ed" opacity="0.22" />
+      <circle cx="32" cy="32" r="18" fill="none" stroke="#fff7ed" strokeWidth="2.4" />
+      <path
+        d="M18 18c4.5-5 12-7 18.5-4.8"
+        stroke="#fff"
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.45"
+      />
+      <g transform="translate(8 6)">
+        <path
+          d="M14 32c0 5.5 5.4 10 12 10s12-4.5 12-10H14Z"
+          fill="url(#bowlGradient)"
+          stroke="#f59e0b"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M18 30h16"
+          stroke="#f59e0b"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M20 22c0-1.4 1.2-2.2 2.4-1.6 1.4.7 1.8 2.7.6 4"
+          stroke="#fff7ed"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M26 20c0-1.4 1.2-2.2 2.4-1.6 1.4.7 1.8 2.7.6 4"
+          stroke="#fff7ed"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M31 22c0-1.4 1.2-2.2 2.4-1.6 1.4.7 1.8 2.7.6 4"
+          stroke="#fff7ed"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M24 25c.6-.6 1.5-.6 2 0l1 1 1-1c.6-.6 1.5-.6 2 0 .6.6.6 1.5 0 2.1l-2 2c-.6.6-1.5.6-2.1 0l-2-2c-.6-.6-.6-1.5.1-2.1Z"
+          fill="#f43f5e"
+        />
+      </g>
+    </svg>
+  );
+}
 
 export default function Layout({ children }) {
   const [user, setUser] = useState(() => getStoredUser());
@@ -53,8 +125,8 @@ export default function Layout({ children }) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to={createPageUrl("Home")} className="flex items-center gap-2">
-              <div className="w-11 h-11 bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg ring-4 ring-white/70">
-                <HelpingHand className="w-5 h-5 text-white drop-shadow" />
+              <div className="w-11 h-11 bg-gradient-to-br from-orange-500 via-amber-400 to-amber-300 rounded-2xl flex items-center justify-center shadow-xl ring-4 ring-white/80 overflow-hidden">
+                <LogoMark size={44} />
               </div>
               <div className="hidden sm:flex flex-col leading-tight">
                 <span className="font-bold text-xl text-slate-900">SharePlate</span>
@@ -220,8 +292,8 @@ export default function Layout({ children }) {
       <footer className="bg-slate-50 border-t border-slate-100 py-8">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-amber-500 rounded-lg flex items-center justify-center">
-              <HelpingHand className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+              <LogoMark size={32} />
             </div>
             <span className="font-semibold text-slate-900">SharePlate</span>
           </div>

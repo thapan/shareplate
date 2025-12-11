@@ -205,9 +205,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fff6ed] via-white to-amber-50/20">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-white to-orange-50">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,183,94,0.25),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(255,214,153,0.2),transparent_30%)]" />
-        <div className="absolute inset-0 opacity-25 bg-[url('https://images.unsplash.com/photo-1493770348161-369560ae357d?w=1920&q=80&auto=format&fit=crop&sat=-100')] bg-cover bg-center" />
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#fff3e0] via-[#fffaf5] to-[#fde7d6]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,183,94,0.18),transparent_40%),radial-gradient(circle_at_75%_15%,rgba(250,204,170,0.18),transparent_35%)]" />
+        <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1920&q=80&auto=format&fit=crop')] bg-cover bg-center" />
         <div className="relative max-w-6xl mx-auto px-4 py-16 md:py-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -215,7 +215,9 @@ export default function Home() {
             className="text-center"
           >
             <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-full px-4 py-2 text-sm text-slate-600 mb-4 shadow">
-              <Sparkles className="w-4 h-4 text-amber-500" />
+              <span className="w-6 h-6 inline-flex items-center justify-center rounded-full bg-gradient-to-br from-orange-500 via-amber-400 to-amber-300 text-white shadow ring-2 ring-white/70">
+                🍲
+              </span>
               <span>Share homemade meals with your community</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-3 tracking-tight leading-tight display-font">
