@@ -1,0 +1,82 @@
+{
+  "name": "Meal",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Name of the dish"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the meal"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Photo of the dish"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the meal will be ready"
+    },
+    "time": {
+      "type": "string",
+      "description": "Time the meal will be ready (e.g., 6:00 PM)"
+    },
+    "portions_available": {
+      "type": "number",
+      "description": "Number of portions available to share"
+    },
+    "portions_claimed": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of portions already claimed"
+    },
+    "cuisine_type": {
+      "type": "string",
+      "enum": [
+        "italian",
+        "mexican",
+        "indian",
+        "chinese",
+        "japanese",
+        "american",
+        "mediterranean",
+        "thai",
+        "french",
+        "other"
+      ],
+      "description": "Type of cuisine"
+    },
+    "dietary_info": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Dietary labels like vegetarian, vegan, gluten-free"
+    },
+    "location": {
+      "type": "string",
+      "description": "Neighborhood or area for pickup"
+    },
+    "cook_name": {
+      "type": "string",
+      "description": "Name of the cook"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "full",
+        "completed",
+        "cancelled"
+      ],
+      "default": "open"
+    }
+  },
+  "required": [
+    "title",
+    "date",
+    "portions_available"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "name": "Review",
+  "type": "object",
+  "properties": {
+    "meal_id": {
+      "type": "string",
+      "description": "Reference to the meal"
+    },
+    "meal_title": {
+      "type": "string",
+      "description": "Title of the meal for easy reference"
+    },
+    "cook_email": {
+      "type": "string",
+      "description": "Email of the cook being reviewed"
+    },
+    "cook_name": {
+      "type": "string",
+      "description": "Name of the cook"
+    },
+    "reviewer_email": {
+      "type": "string",
+      "description": "Email of person leaving review"
+    },
+    "reviewer_name": {
+      "type": "string",
+      "description": "Name of reviewer"
+    },
+    "rating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Star rating from 1 to 5"
+    },
+    "review_text": {
+      "type": "string",
+      "description": "Written review"
+    }
+  },
+  "required": [
+    "meal_id",
+    "cook_email",
+    "reviewer_email",
+    "rating"
+  ]
+}

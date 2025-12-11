@@ -1,0 +1,48 @@
+{
+  "name": "MealRequest",
+  "type": "object",
+  "properties": {
+    "meal_id": {
+      "type": "string",
+      "description": "Reference to the meal"
+    },
+    "meal_title": {
+      "type": "string",
+      "description": "Title of the meal for easy reference"
+    },
+    "cook_email": {
+      "type": "string",
+      "description": "Email of the cook"
+    },
+    "requester_name": {
+      "type": "string",
+      "description": "Name of person requesting"
+    },
+    "requester_email": {
+      "type": "string",
+      "description": "Email of person requesting"
+    },
+    "portions_requested": {
+      "type": "number",
+      "default": 1,
+      "description": "Number of portions requested"
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional message to the cook"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "declined"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "meal_id",
+    "requester_email"
+  ]
+}
