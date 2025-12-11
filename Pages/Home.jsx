@@ -32,7 +32,7 @@ export default function Home() {
   const [userLocation, setUserLocation] = useState(null);
   const [locationStatus, setLocationStatus] = useState("pending"); // pending | ready | denied | unavailable
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const RADIUS_MILES = 15;
+  const [radiusMiles, setRadiusMiles] = useState(15);
   
   const queryClient = useQueryClient();
 
@@ -150,7 +150,7 @@ export default function Home() {
 
     const hasCoords = meal.lat != null && meal.lng != null;
     const withinRadius = userLocation && hasCoords
-      ? distanceInMiles(userLocation, { lat: meal.lat, lng: meal.lng }) <= RADIUS_MILES
+      ? (radiusMiles ? distanceInMiles(userLocation, { lat: meal.lat, lng: meal.lng }) <= radiusMiles : true)
       : true; // include if we can't measure
 
     if (activeFilter === "all") return matchesSearch && matchesCity && withinRadius;
@@ -215,8 +215,21 @@ export default function Home() {
             className="text-center"
           >
             <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-full px-4 py-2 text-sm text-slate-600 mb-4 shadow">
-              <span className="w-6 h-6 inline-flex items-center justify-center rounded-full bg-gradient-to-br from-orange-500 via-amber-400 to-amber-300 text-white shadow ring-2 ring-white/70">
-                🍲
+              <span className="w-7 h-7 inline-flex items-center justify-center rounded-full bg-gradient-to-br from-orange-500 via-amber-400 to-amber-300 shadow ring-2 ring-white/70">
+                <svg width="16" height="16" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="miniPlate" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#fff7ed" />
+                      <stop offset="1" stopColor="#fde68a" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="16" cy="16" r="14" fill="#fff7ed" opacity="0.35" />
+                  <circle cx="16" cy="16" r="10" fill="url(#miniPlate)" stroke="#fef3c7" strokeWidth="1.5" />
+                  <path d="M10 18c0 3.3 2.7 6 6 6s6-2.7 6-6H10Z" fill="#f59e0b" stroke="#f97316" strokeWidth="1.2" />
+                  <path d="M12 15h8" stroke="#f97316" strokeWidth="1.2" strokeLinecap="round" />
+                  <path d="M13 12c0-1 1-.9 1.6-.5.7.4.9 1.4.3 2" stroke="#f43f5e" strokeWidth="1.2" strokeLinecap="round" />
+                  <path d="M16 11.5c0-1 1-.9 1.6-.5.7.4.9 1.4.3 2" stroke="#f43f5e" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
               </span>
               <span>Share homemade meals with your community</span>
             </div>
@@ -290,11 +303,24 @@ export default function Home() {
           <Badge variant="outline" className="bg-white border-slate-200 flex items-center gap-2">
             <MapPin className="w-4 h-4 text-amber-500" />
             {locationStatus === "ready" && userLocation
-              ? `Within ${RADIUS_MILES} miles of you`
+              ? `Within ${radiusMiles || 'any'} miles of you`
               : locationStatus === "pending"
                 ? "Detecting your location..."
                 : "Location not available; showing all meals"}
           </Badge>
+          <label className="flex items-center gap-2 text-sm text-slate-600">
+            Distance:
+            <select
+              className="h-9 rounded-lg border border-slate-200 bg-white px-2"
+              value={radiusMiles}
+              onChange={(e) => setRadiusMiles(Number(e.target.value))}
+            >
+              {[5, 10, 15, 25, 50].map((miles) => (
+                <option key={miles} value={miles}>{miles} miles</option>
+              ))}
+              <option value={0}>Any</option>
+            </select>
+          </label>
           {locationStatus !== "ready" && (
             <Button
               variant="outline"

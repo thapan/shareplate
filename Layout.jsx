@@ -124,13 +124,13 @@ export default function Layout({ children }) {
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to={createPageUrl("Home")} className="flex items-center gap-2">
-              <div className="w-11 h-11 bg-gradient-to-br from-orange-500 via-amber-400 to-amber-300 rounded-2xl flex items-center justify-center shadow-xl ring-4 ring-white/80 overflow-hidden">
+            <Link to={createPageUrl("Home")} className="flex items-center gap-2.5">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 via-amber-400 to-amber-300 rounded-full flex items-center justify-center shadow-lg ring-3 ring-white/70 overflow-hidden">
                 <LogoMark size={44} />
               </div>
-              <div className="hidden sm:flex flex-col leading-tight">
-                <span className="font-bold text-xl text-slate-900">SharePlate</span>
-                <span className="text-[11px] tracking-[0.08em] uppercase text-amber-600 font-semibold">
+              <div className="flex flex-col leading-tight">
+                <span className="font-bold text-lg sm:text-xl text-slate-900">SharePlate</span>
+                <span className="text-[10px] sm:text-[11px] tracking-[0.08em] uppercase text-amber-600 font-semibold">
                   Cook · Share · Socialize
                 </span>
               </div>
