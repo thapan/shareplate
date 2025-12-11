@@ -92,6 +92,9 @@ export default function MealDetailsModal({ meal, open, onClose, onRequestMeal })
                   <p className="text-slate-600 leading-relaxed">{meal.description}</p>
                 </div>
               )}
+              <div className="bg-amber-50 border border-amber-100 text-amber-800 text-xs rounded-lg px-3 py-2">
+                Community sharing only—no payments or delivery. Hosts and guests coordinate pickup directly; participation is at your discretion and we are not responsible for food safety.
+              </div>
 
               {/* Dietary info */}
               {meal.dietary_info && meal.dietary_info.length > 0 && (

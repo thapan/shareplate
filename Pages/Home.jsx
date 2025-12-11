@@ -175,6 +175,33 @@ export default function Home() {
     )
   );
 
+  const faqs = [
+    {
+      q: "Is everything free? Do you process payments?",
+      a: "Yes. This is free community sharing. We do not process payments, tips, or delivery fees.",
+    },
+    {
+      q: "Who’s responsible for food safety?",
+      a: "Hosts and guests participate at their own discretion. We don’t verify food or assume responsibility for safety.",
+    },
+    {
+      q: "Is this a delivery service?",
+      a: "No. This is a community social platform. Hosts and guests coordinate pickup directly.",
+    },
+    {
+      q: "How do I request a meal?",
+      a: "Sign in, open a meal, and send a request. The host will confirm and coordinate with you.",
+    },
+    {
+      q: "How do I share a meal?",
+      a: "Create a meal with date, time, portions, and location. Respond to requests from the community.",
+    },
+    {
+      q: "What about dietary needs?",
+      a: "Check the meal’s dietary info and ask the host in messages if you need more details.",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50/50 via-white to-amber-50/30">
       {/* Hero Section */}
@@ -186,16 +213,16 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur rounded-full px-4 py-2 text-sm text-slate-600 mb-6 shadow-sm">
+            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur rounded-full px-4 py-2 text-sm text-slate-600 mb-4 shadow-sm">
               <Sparkles className="w-4 h-4 text-amber-500" />
               <span>Share homemade meals with your community</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-4 tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-3 tracking-tight leading-tight">
               Home cooking,
               <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent"> shared</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-              Discover delicious homemade meals from talented home cooks in your neighborhood. Share your own creations too!
+            <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto mb-6">
+              Discover homemade meals from local cooks—or share yours—and connect over real food.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -217,6 +244,9 @@ export default function Home() {
                 Browse Meals
               </Button>
             </div>
+            <p className="text-sm text-slate-500 mt-4">
+              Free community sharing only—no payments or delivery. Hosts and guests coordinate directly.
+            </p>
           </motion.div>
         </div>
         
@@ -334,6 +364,28 @@ export default function Home() {
             </Button>
           </div>
         )}
+      </div>
+
+      {/* FAQ Section */}
+      <div className="max-w-4xl mx-auto px-4 pb-16">
+        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-6 md:p-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">FAQs</h2>
+          <p className="text-slate-600 mb-6">Quick answers about how FoodShare works.</p>
+          <div className="space-y-4">
+            {faqs.map((item, idx) => (
+              <details
+                key={idx}
+                className="group border border-slate-100 rounded-xl px-4 py-3 bg-slate-50/50"
+              >
+                <summary className="flex items-center justify-between cursor-pointer list-none">
+                  <span className="font-semibold text-slate-900">{item.q}</span>
+                  <span className="text-slate-400 group-open:rotate-45 transition-transform">+</span>
+                </summary>
+                <p className="text-sm text-slate-600 mt-2 leading-relaxed">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Create Meal Sheet */}
