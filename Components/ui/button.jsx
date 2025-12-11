@@ -7,17 +7,18 @@ export const Button = React.forwardRef(function Button(
 ) {
   const Comp = asChild ? 'span' : 'button';
   const base =
-    'inline-flex items-center justify-center font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none';
+    'inline-flex items-center justify-center font-medium transition-all disabled:opacity-50 disabled:pointer-events-none rounded-full';
   const variants = {
-    default: 'bg-slate-900 text-white hover:bg-slate-800',
-    ghost: 'bg-transparent hover:bg-slate-100',
-    outline: 'border border-slate-200 bg-white hover:bg-slate-50',
+    default:
+      'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-sm hover:shadow-lg hover:from-orange-600 hover:to-amber-600',
+    ghost: 'bg-transparent hover:bg-slate-100 text-slate-700',
+    outline: 'border border-slate-200 bg-white hover:bg-amber-50 text-slate-800',
     secondary: 'bg-slate-100 text-slate-900 hover:bg-slate-200',
   };
   const sizes = {
-    md: 'h-10 px-4 py-2 rounded-lg text-sm',
-    lg: 'h-12 px-5 rounded-xl text-base',
-    icon: 'h-10 w-10 rounded-lg',
+    md: 'h-10 px-4 text-sm',
+    lg: 'h-12 px-6 text-base',
+    icon: 'h-10 w-10',
   };
   return (
     <Comp

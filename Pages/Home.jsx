@@ -11,7 +11,7 @@ import {
   SheetTitle,
 } from "@/Components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs";
-import { Plus, Search, Utensils, Calendar, Sparkles } from "lucide-react";
+import { Plus, Search, Utensils, Calendar, Sparkles, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import MealCard from "@/Components/meals/MealCard";
@@ -203,21 +203,22 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50/50 via-white to-amber-50/30">
+    <div className="min-h-screen bg-gradient-to-b from-[#fff6ed] via-white to-amber-50/20">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-50">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1920')] bg-cover bg-center opacity-10" />
+      <div className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-white to-orange-50">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,183,94,0.25),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(255,214,153,0.2),transparent_30%)]" />
+        <div className="absolute inset-0 opacity-25 bg-[url('https://images.unsplash.com/photo-1493770348161-369560ae357d?w=1920&q=80&auto=format&fit=crop&sat=-100')] bg-cover bg-center" />
         <div className="relative max-w-6xl mx-auto px-4 py-16 md:py-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur rounded-full px-4 py-2 text-sm text-slate-600 mb-4 shadow-sm">
+            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-full px-4 py-2 text-sm text-slate-600 mb-4 shadow">
               <Sparkles className="w-4 h-4 text-amber-500" />
               <span>Share homemade meals with your community</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-3 tracking-tight leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-3 tracking-tight leading-tight display-font">
               Home cooking,
               <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent"> shared</span>
             </h1>
@@ -284,9 +285,10 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-3 mb-6 flex-wrap">
-          <Badge variant="outline" className="bg-white border-slate-200">
+          <Badge variant="outline" className="bg-white border-slate-200 flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-amber-500" />
             {locationStatus === "ready" && userLocation
-              ? `Showing meals within ${RADIUS_MILES} miles of you`
+              ? `Within ${RADIUS_MILES} miles of you`
               : locationStatus === "pending"
                 ? "Detecting your location..."
                 : "Location not available; showing all meals"}
@@ -369,8 +371,8 @@ export default function Home() {
       {/* FAQ Section */}
       <div className="max-w-4xl mx-auto px-4 pb-16">
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-6 md:p-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">FAQs</h2>
-          <p className="text-slate-600 mb-6">Quick answers about how FoodShare works.</p>
+          <h2 className="text-2xl font-bold text-slate-900 mb-4 display-font">FAQs</h2>
+          <p className="text-slate-600 mb-6">Quick answers about how SharePlate works.</p>
           <div className="space-y-4">
             {faqs.map((item, idx) => (
               <details
@@ -379,7 +381,7 @@ export default function Home() {
               >
                 <summary className="flex items-center justify-between cursor-pointer list-none">
                   <span className="font-semibold text-slate-900">{item.q}</span>
-                  <span className="text-slate-400 group-open:rotate-45 transition-transform">+</span>
+                  <span className="text-slate-400 group-open:rotate-180 transition-transform">⌄</span>
                 </summary>
                 <p className="text-sm text-slate-600 mt-2 leading-relaxed">{item.a}</p>
               </details>

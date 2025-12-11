@@ -1,6 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&display=swap');
+
+:root {
+  --font-display: 'Fraunces', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
 
 * {
   box-sizing: border-box;
@@ -13,6 +15,11 @@ body {
   color: #0f172a;
 }
 
+h1, h2, h3, .display-font {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -21,3 +28,7 @@ a {
 button {
   font: inherit;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
-import { ChefHat, User, LogOut, Utensils, Menu, X, Users, MessageSquare } from "lucide-react";
+import { ChefHat, User, LogOut, Utensils, Menu, X, Users, MessageSquare, HelpingHand } from "lucide-react";
 
 export default function Layout({ children }) {
   const [user, setUser] = useState(() => getStoredUser());
@@ -53,11 +53,11 @@ export default function Layout({ children }) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to={createPageUrl("Home")} className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-xl flex items-center justify-center">
-                <Utensils className="w-5 h-5 text-white" />
+              <div className="w-11 h-11 bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg ring-4 ring-white/70">
+                <HelpingHand className="w-5 h-5 text-white drop-shadow" />
               </div>
               <div className="hidden sm:flex flex-col leading-tight">
-                <span className="font-bold text-xl text-slate-900">FoodShare</span>
+                <span className="font-bold text-xl text-slate-900">SharePlate</span>
                 <span className="text-[11px] tracking-[0.08em] uppercase text-amber-600 font-semibold">
                   Cook · Share · Socialize
                 </span>
@@ -221,9 +221,9 @@ export default function Layout({ children }) {
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
             <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-amber-500 rounded-lg flex items-center justify-center">
-              <Utensils className="w-4 h-4 text-white" />
+              <HelpingHand className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold text-slate-900">FoodShare</span>
+            <span className="font-semibold text-slate-900">SharePlate</span>
           </div>
           <p className="text-sm text-slate-500">
             Community platform for free sharing. No payments or delivery. Participation is at your discretion and we are not responsible for food safety.

@@ -61,7 +61,7 @@ export function verifyEmailOtp(email, code) {
   }
   if (record.code !== code) throw new Error('Invalid code.');
 
-  const user = { email, full_name: record.full_name || 'FoodShare User' };
+  const user = { email, full_name: record.full_name || 'SharePlate User' };
   delete store[email];
   writeOtpStore(store);
   setStoredUser(user);

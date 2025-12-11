@@ -125,7 +125,7 @@ export default function Messages() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
         <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-4 bg-amber-50 border border-amber-100 text-amber-800 text-sm px-4 py-2 rounded-lg">
+        <div className="mb-4 bg-amber-50/70 border border-amber-100 text-amber-800 text-sm px-4 py-2 rounded-full">
           Coordinate directly with hosts. This is a community platform—no payments or delivery, and sharing is at your discretion.
         </div>
         {/* Header */}

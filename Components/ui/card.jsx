@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 
 export function Card({ className = '', ...props }) {
-  return <div className={clsx('bg-white border border-slate-200 rounded-xl', className)} {...props} />;
+  return <div className={clsx('bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-xl transition-shadow', className)} {...props} />;
 }
 
 export function CardHeader({ className = '', ...props }) {
