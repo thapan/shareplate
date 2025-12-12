@@ -7,6 +7,7 @@ const routes = {
   Login: "/login",
   Signup: "/signup",
   Policies: "/policies",
+  Admin: "/admin",
 };
 
 export function createPageUrl(name) {

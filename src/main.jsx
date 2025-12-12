@@ -11,6 +11,7 @@ import Login from '@/Pages/Login';
 import Signup from '@/Pages/Signup';
 import MyMeals from '@/Pages/MyMeals';
 import Policies from '@/Pages/Policies';
+import AdminDashboard from '@/Pages/AdminDashboard';
 import ErrorBoundary from '@/Components/ErrorBoundary';
 import './styles.css';
 import { supabase } from '@/src/lib/supabaseClient';
@@ -87,6 +88,7 @@ function AppRouter() {
                     </RequireAuth>
                   }
                 />
+                <Route path="/admin" element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
                 <Route path="/login" element={<ErrorBoundary><Login /></ErrorBoundary>} />
                 <Route path="/signup" element={<ErrorBoundary><Signup /></ErrorBoundary>} />
                 <Route path="/policies" element={<ErrorBoundary><Policies /></ErrorBoundary>} />

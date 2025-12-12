@@ -14,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Plus, Search, Utensils, Calendar, Sparkles, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import FeedbackWidget from "@/Components/FeedbackWidget";
 import MealCard from "@/Components/meals/MealCard";
 import MealRequestModal from "@/Components/meals/MealRequestModal";
 import MealDetailsModal from "@/Components/meals/MealDetailsModal";
@@ -447,6 +448,11 @@ export default function Home() {
             <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-3 tracking-tight leading-tight display-font">
               Home cooking,
               <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent"> shared</span>
+              <div className="flex items-center justify-center gap-3 mt-4">
+                <span className="bg-orange-500 text-white text-sm px-3 py-1 rounded-full font-semibold shadow-lg">
+                  Early Access
+                </span>
+              </div>
             </h1>
             <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto mb-6">
               Discover homemade meals from local cooks—or share yours—and connect over real food.
@@ -723,6 +729,9 @@ export default function Home() {
         onSubmit={handleRequestSubmit}
         isSubmitting={isSubmitting}
       />
+      
+      {/* Feedback Widget */}
+      <FeedbackWidget />
     </div>
   );
 }

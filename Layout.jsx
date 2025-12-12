@@ -90,6 +90,7 @@ export default function Layout({ children }) {
   const [user, setUser] = useState(() => getStoredUser());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const cooksPath = user ? createPageUrl("CookProfiles") : createPageUrl("Login");
 
@@ -98,9 +99,11 @@ export default function Layout({ children }) {
     const { data: profile } = await supabase.from('users').select('*').eq('email', authedEmail).maybeSingle();
     const full_name = profile?.full_name || metadataName || 'User';
     const profile_picture = profile?.profile_picture;
+    const is_admin = profile?.is_admin || false;
     const hydrated = { email: authedEmail, full_name, profile_picture };
     setStoredUser(hydrated);
     setUser(hydrated);
+    setIsAdmin(is_admin);
     return hydrated;
   };
 
@@ -112,6 +115,7 @@ export default function Layout({ children }) {
   const handleSignOut = () => {
     setStoredUser(null);
     setUser(null);
+    setIsAdmin(false);
     signOut();
     navigate(createPageUrl("Login"));
   };
@@ -136,6 +140,7 @@ export default function Layout({ children }) {
       if (event === 'SIGNED_OUT') {
         setStoredUser(null);
         setUser(null);
+        setIsAdmin(false);
       }
     });
     return () => listener?.subscription?.unsubscribe();
@@ -173,7 +178,10 @@ export default function Layout({ children }) {
                 <LogoMark size={44} />
               </div>
               <div className="flex flex-col leading-tight">
-                <span className="font-bold text-lg sm:text-xl text-slate-900">SharePlate</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-lg sm:text-xl text-slate-900">SharePlate</span>
+                  <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">BETA</span>
+                </div>
                 <span className="text-[10px] sm:text-[11px] tracking-[0.08em] uppercase text-amber-600 font-semibold">
                   Cook · Share · Socialize
                 </span>
@@ -214,6 +222,15 @@ export default function Layout({ children }) {
                     </Button>
                   </Link>
                   
+                  {isAdmin && (
+                    <Link to={createPageUrl("Admin")}>
+                      <Button variant="ghost" className="text-slate-600 hover:text-slate-900">
+                        <ShieldCheck className="w-4 h-4 mr-2" />
+                        Admin
+                      </Button>
+                    </Link>
+                  )}
+                  
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="gap-2 pr-1 pl-1.5">
@@ -237,6 +254,14 @@ export default function Layout({ children }) {
                           My Meals
                         </Link>
                       </DropdownMenuItem>
+                      {isAdmin && (
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl("Admin")} className="cursor-pointer">
+                            <ShieldCheck className="w-4 h-4 mr-2" />
+                            Admin Dashboard
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem 
                         onClick={handleSignOut}
@@ -314,6 +339,17 @@ export default function Layout({ children }) {
                       My Meals
                     </Button>
                   </Link>
+                  {isAdmin && (
+                    <Link 
+                      to={createPageUrl("Admin")} 
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Button variant="ghost" className="w-full justify-start">
+                        <ShieldCheck className="w-4 h-4 mr-2" />
+                        Admin Dashboard
+                      </Button>
+                    </Link>
+                  )}
                   <Button 
                     variant="ghost" 
                     className="w-full justify-start text-red-600"
