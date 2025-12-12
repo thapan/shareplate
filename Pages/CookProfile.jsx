@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { mockApi } from '../mockApi';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent } from "@/Components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
@@ -14,6 +13,9 @@ import MealCard from "@/Components/meals/MealCard";
 import MealDetailsModal from "@/Components/meals/MealDetailsModal";
 import MealRequestModal from "@/Components/meals/MealRequestModal";
 import { getStoredUser, DEMO_USER } from '../auth';
+import { supabase } from "@/src/lib/supabaseClient";
+import ReviewForm from "@/Components/reviews/ReviewForm";
+import { toast } from "sonner";
 
 export default function CookProfile() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -30,27 +32,52 @@ export default function CookProfile() {
   const { data: cook, isLoading: loadingCook } = useQuery({
     queryKey: ['cook-profile', cookEmail],
     queryFn: async () => {
-      const users = await mockApi.entities.User.filter({ email: cookEmail });
-      return users[0] || null;
+      const { data, error } = await supabase.from('users').select('*').eq('email', cookEmail);
+      if (error) throw error;
+      return data?.[0] || null;
     },
     enabled: !!cookEmail,
   });
 
   const { data: cookMeals = [], isLoading: loadingMeals } = useQuery({
     queryKey: ['cook-meals', cookEmail],
-    queryFn: () => mockApi.entities.Meal.filter({ created_by: cookEmail }, '-created_date'),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('meals')
+        .select('*')
+        .eq('created_by', cookEmail)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!cookEmail,
   });
 
   const { data: cookReviews = [], isLoading: loadingReviews } = useQuery({
     queryKey: ['cook-reviews', cookEmail],
-    queryFn: () => mockApi.entities.Review.filter({ cook_email: cookEmail }, '-created_date'),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('cook_email', cookEmail)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!cookEmail,
   });
 
   const { data: allReviews = [] } = useQuery({
     queryKey: ['all-reviews-for-ratings'],
-    queryFn: () => mockApi.entities.Review.list('-created_date', 1000),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1000);
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   // Calculate ratings
@@ -86,6 +113,31 @@ export default function CookProfile() {
   }
 
   const cookName = cook?.full_name || cookMeals[0]?.cook_name || "Cook";
+  const queryClient = useQueryClient();
+  const hasReviewedCook = user?.email && cookReviews.some((r) => r.reviewer_email === user.email && r.cook_email === cookEmail);
+
+  const reviewCookMutation = useMutation({
+    mutationFn: async ({ rating, review_text }) => {
+      if (!user?.email) throw new Error("Please sign in to leave a review.");
+      const { error } = await supabase.from('reviews').insert({
+        rating,
+        review_text,
+        reviewer_email: user.email,
+        reviewer_name: user.full_name || "Guest",
+        cook_email: cookEmail,
+        cook_name: cookName,
+      });
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['cook-reviews', cookEmail] }),
+        queryClient.invalidateQueries({ queryKey: ['all-reviews-for-ratings'] }),
+      ]);
+      toast.success("Review submitted");
+    },
+    onError: (err) => toast.error(err?.message || "Could not submit review."),
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -230,6 +282,23 @@ export default function CookProfile() {
                 <div className="text-center py-16">
                   <Star className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                   <p className="text-slate-600">No reviews yet</p>
+                </div>
+              )}
+              {!hasReviewedCook && user?.email && (
+                <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mt-4">
+                  <ReviewForm
+                    meal={{ title: cookName || "Cook" }}
+                    onSubmit={({ rating, review_text }) => reviewCookMutation.mutate({ rating, review_text })}
+                    onCancel={() => {}}
+                    isSubmitting={reviewCookMutation.isPending}
+                  />
+                </div>
+              )}
+              {!user?.email && (
+                <div className="text-sm text-slate-600 text-center mt-4">
+                  <a href={createPageUrl("Login")} className="text-amber-600 font-semibold hover:underline">
+                    Sign in to leave a review
+                  </a>
                 </div>
               )}
             </AnimatePresence>

@@ -1,34 +1,74 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
 const MenuContext = createContext(null);
 
 export function DropdownMenu({ children }) {
-  const state = useState(false);
-  return <MenuContext.Provider value={state}>{children}</MenuContext.Provider>;
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  // Close on outside click or Esc
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (!containerRef.current) return;
+      if (!containerRef.current.contains(e.target)) setOpen(false);
+    };
+    const handleKey = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, []);
+
+  return (
+    <MenuContext.Provider value={{ open, setOpen, containerRef }}>
+      <div ref={containerRef} className="relative inline-flex text-left">
+        {children}
+      </div>
+    </MenuContext.Provider>
+  );
 }
 
 export function DropdownMenuTrigger({ asChild = false, children, ...props }) {
-  const [, setOpen] = useContext(MenuContext);
-  const Comp = asChild ? React.Fragment : 'button';
-  const trigger = (
-    <button type="button" onClick={() => setOpen((o) => !o)} {...props}>
+  const { setOpen } = useContext(MenuContext);
+
+  const handleClick = (e) => {
+    if (children?.props?.onClick) children.props.onClick(e);
+    setOpen((o) => !o);
+  };
+
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children, {
+      onClick: handleClick,
+      'aria-haspopup': 'menu',
+      'aria-expanded': undefined,
+      ...props,
+    });
+  }
+
+  return (
+    <button type="button" onClick={handleClick} {...props}>
       {children}
     </button>
   );
-  return asChild ? React.cloneElement(children, { onClick: () => setOpen((o) => !o) }) : trigger;
 }
 
 export function DropdownMenuContent({ className = '', align = 'start', children, ...props }) {
-  const [open] = useContext(MenuContext);
+  const { open } = useContext(MenuContext);
   if (!open) return null;
   return (
     <div
       className={clsx(
-        'mt-2 min-w-[160px] bg-white border border-slate-200 rounded-lg shadow-lg p-1',
+        'absolute z-50 mt-2 min-w-[200px] bg-white border border-slate-200 rounded-xl shadow-xl p-1',
         className,
-        align === 'end' && 'ml-auto'
+        align === 'end' ? 'right-0' : 'left-0',
+        'top-full'
       )}
+      role="menu"
       {...props}
     >
       {children}

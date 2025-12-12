@@ -23,15 +23,15 @@ const seedUsers = [
 
 const seedMeals = [
   {
-    id: "meal_lasagna",
-    title: "Hearty Veggie Lasagna",
-    description: "Layers of roasted vegetables, ricotta, and fresh pasta sheets baked golden.",
+    id: "meal_paella",
+    title: "Sunshine Veggie Paella",
+    description: "Saffron rice with roasted peppers, artichokes, and chickpeas—bright, hearty, and sharable.",
     image_url: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200",
     date: new Date().toISOString().split("T")[0],
     time: "6:00 PM",
     portions_available: 6,
     portions_claimed: 2,
-    cuisine_type: "italian",
+    cuisine_type: "mediterranean",
     dietary_info: ["vegetarian"],
     location: "Downtown",
     lat: 37.7749,
@@ -65,8 +65,8 @@ const seedMeals = [
 const seedReviews = [
   {
     id: "review_1",
-    meal_id: "meal_lasagna",
-    meal_title: "Hearty Veggie Lasagna",
+    meal_id: "meal_paella",
+    meal_title: "Sunshine Veggie Paella",
     cook_email: "maria@foodshare.com",
     cook_name: "Maria Rossi",
     reviewer_email: "demo@foodshare.com",
@@ -96,7 +96,7 @@ const seedMessages = [
     sender_name: "Demo User",
     receiver_email: "maria@foodshare.com",
     receiver_name: "Maria Rossi",
-    content: "Hi Maria! Is the lasagna available for pickup at 6?",
+    content: "Hi Maria! Is the paella available for pickup at 6?",
     is_read: false,
     created_date: nowIso(),
   },

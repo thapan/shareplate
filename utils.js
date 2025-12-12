@@ -5,6 +5,8 @@ const routes = {
   Messages: "/messages",
   MyMeals: "/my-meals",
   Login: "/login",
+  Signup: "/signup",
+  Policies: "/policies",
 };
 
 export function createPageUrl(name) {

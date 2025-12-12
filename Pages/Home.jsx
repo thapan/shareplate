@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { mockApi } from '../mockApi';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
@@ -19,9 +19,12 @@ import MealRequestModal from "@/Components/meals/MealRequestModal";
 import MealDetailsModal from "@/Components/meals/MealDetailsModal";
 import CreateMealForm from "@/Components/meals/CreateMealForm";
 import { DEMO_USER, getStoredUser, setStoredUser } from '../auth';
+import { createPageUrl } from '@/utils';
 import { Badge } from "@/Components/ui/badge";
+import { supabase } from "@/src/lib/supabaseClient";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(() => getStoredUser());
   const [showCreateSheet, setShowCreateSheet] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -33,17 +36,40 @@ export default function Home() {
   const [locationStatus, setLocationStatus] = useState("pending"); // pending | ready | denied | unavailable
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [radiusMiles, setRadiusMiles] = useState(15);
+  const [editingMeal, setEditingMeal] = useState(null);
   
   const queryClient = useQueryClient();
+  const toOptimizedUrl = (bucket, path) => {
+    const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(path, {
+      transform: { width: 900, quality: 75 },
+    });
+    return publicUrlData?.publicUrl || '';
+  };
 
   const { data: meals = [], isLoading } = useQuery({
     queryKey: ['meals'],
-    queryFn: () => mockApi.entities.Meal.filter({ status: 'open' }, '-created_date'),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('meals')
+        .select('*')
+        .eq('status', 'open')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   const { data: allReviews = [] } = useQuery({
     queryKey: ['all-reviews'],
-    queryFn: () => mockApi.entities.Review.list('-created_date', 1000),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1000);
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   useEffect(() => {
@@ -72,22 +98,123 @@ export default function Home() {
   });
 
   const createMealMutation = useMutation({
-    mutationFn: ({ user: creator = DEMO_USER, ...data }) => mockApi.entities.Meal.create({
-      ...data,
-      cook_name: creator.full_name || "Home Cook",
-      status: "open",
-      portions_claimed: 0,
-    }),
+    mutationFn: async ({ user: creator, image_file, ...data }) => {
+      if (!creator?.email) throw new Error("Missing user email");
+      // Ensure user exists
+      const { error: userErr } = await supabase
+        .from('users')
+        .upsert(
+          { email: creator.email, full_name: creator.full_name || 'Home Cook' },
+          { onConflict: 'email' }
+        );
+      if (userErr) throw userErr;
+
+      let imageUrl = data.image_url || "";
+      if (image_file) {
+        const bucket = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || 'meal-images';
+        const fileExt = image_file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(16).slice(2)}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage.from(bucket).upload(fileName, image_file);
+        if (uploadError) throw uploadError;
+        imageUrl = toOptimizedUrl(bucket, fileName);
+      }
+
+      const { error } = await supabase.from('meals').insert({
+        ...data,
+        cook_name: creator.full_name || "Home Cook",
+        created_by: creator.email,
+        status: "open",
+        portions_claimed: 0,
+        image_url: imageUrl,
+      });
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['meals'] });
       setShowCreateSheet(false);
       toast.success("Meal shared successfully!");
     },
+    onError: (err) => toast.error(err?.message || "Could not share meal. Please try again."),
+  });
+
+  const updateMealMutation = useMutation({
+    mutationFn: async ({ id, userEmail, image_file, existingImageUrl = "", ...data }) => {
+      if (!userEmail) throw new Error("Missing user email");
+      let imageUrl = existingImageUrl || "";
+      if (image_file) {
+        const bucket = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || 'meal-images';
+        const fileExt = image_file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(16).slice(2)}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage.from(bucket).upload(fileName, image_file);
+        if (uploadError) throw uploadError;
+        imageUrl = toOptimizedUrl(bucket, fileName);
+      }
+
+      const { error } = await supabase
+        .from('meals')
+        .update({ ...data, image_url: imageUrl })
+        .eq('id', id)
+        .eq('created_by', userEmail);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['meals'] });
+      setShowCreateSheet(false);
+      setEditingMeal(null);
+      toast.success("Meal updated");
+    },
+    onError: (err) => toast.error(err?.message || "Could not update meal. Please try again."),
+  });
+
+  const deleteMealMutation = useMutation({
+    mutationFn: async ({ meal, userEmail }) => {
+      if (!userEmail) throw new Error("Missing user email");
+
+      // Best-effort delete related requests first
+      await supabase.from('meal_requests').delete().eq('meal_id', meal.id);
+
+      // Best-effort remove image from storage if it lives in our bucket
+      if (meal.image_url) {
+        try {
+          const bucket = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || 'meal-images';
+          const match = meal.image_url.match(/object\/public\/(.*?)\/(.+)$/);
+          if (match) {
+            const [, urlBucket, path] = match;
+            if (urlBucket === bucket) {
+              await supabase.storage.from(bucket).remove([path]);
+            }
+          }
+        } catch {
+          // ignore storage cleanup errors
+        }
+      }
+
+      const { error } = await supabase
+        .from('meals')
+        .delete()
+        .eq('id', meal.id)
+        .eq('created_by', userEmail);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['meals'] });
+      toast.success("Meal removed");
+    },
+    onError: (err) => toast.error(err?.message || "Could not delete meal. Please try again."),
   });
 
   const createRequestMutation = useMutation({
-    mutationFn: async ({ meal, portions, message, user: requester = DEMO_USER }) => {
-      await mockApi.entities.MealRequest.create({
+    mutationFn: async ({ meal, portions, message, user: requester }) => {
+      if (!requester?.email) throw new Error("Missing user email");
+      const { error: userErr } = await supabase
+        .from('users')
+        .upsert(
+          { email: requester.email, full_name: requester.full_name || 'Food Lover' },
+          { onConflict: 'email' }
+        );
+      if (userErr) throw userErr;
+
+      const { error: reqError } = await supabase.from('meal_requests').insert({
         meal_id: meal.id,
         meal_title: meal.title,
         cook_email: meal.created_by,
@@ -97,35 +224,92 @@ export default function Home() {
         message,
         status: "pending",
       });
-      
-      await mockApi.entities.Meal.update(meal.id, {
-        portions_claimed: (meal.portions_claimed || 0) + portions,
-        status: (meal.portions_claimed || 0) + portions >= meal.portions_available ? "full" : "open",
-      });
+      if (reqError) throw reqError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['meals'] });
       setSelectedMeal(null);
       toast.success("Request sent to the cook!");
     },
+    onError: () => toast.error("Could not send request. Please try again."),
   });
 
   const handleRequestSubmit = async ({ portions, message }) => {
-    const currentUser = user || DEMO_USER;
-    setStoredUser(currentUser);
-    setUser(currentUser);
+    if (!user?.email) {
+      toast.error("Please sign in to request a meal.");
+      navigate(createPageUrl("Login"));
+      return;
+    }
     setIsSubmitting(true);
-    await createRequestMutation.mutateAsync({ meal: selectedMeal, portions, message, user: currentUser });
+    await createRequestMutation.mutateAsync({ meal: selectedMeal, portions, message, user });
     setIsSubmitting(false);
   };
 
-  const handleCreateMeal = async (data) => {
-    const currentUser = user || DEMO_USER;
-    setStoredUser(currentUser);
-    setUser(currentUser);
+  const handleCreateOrUpdateMeal = async (data) => {
+    if (!user?.email) {
+      toast.error("Please sign in to share a meal.");
+      navigate(createPageUrl("Login"));
+      return;
+    }
     setIsSubmitting(true);
-    await createMealMutation.mutateAsync({ ...data, user: currentUser });
-    setIsSubmitting(false);
+    try {
+      if (editingMeal) {
+        await updateMealMutation.mutateAsync({
+          ...data,
+          id: editingMeal.id,
+          userEmail: user.email,
+          existingImageUrl: editingMeal.image_url,
+        });
+      } else {
+        await createMealMutation.mutateAsync({ ...data, user });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.message || "Could not share meal. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditMeal = (meal) => {
+    if (!user?.email) {
+      navigate(createPageUrl("Login"));
+      return;
+    }
+    setEditingMeal(meal);
+    setShowCreateSheet(true);
+  };
+
+  const handleDeleteMeal = async (meal) => {
+    if (!user?.email) {
+      navigate(createPageUrl("Login"));
+      return;
+    }
+    const confirmed = window.confirm("Delete this meal? This cannot be undone.");
+    if (!confirmed) return;
+    await deleteMealMutation.mutateAsync({ meal, userEmail: user.email });
+  };
+
+  const handleOpenCreate = () => {
+    if (!user?.email) {
+      toast.error("Please sign in to share a meal.");
+      navigate(createPageUrl("Login"));
+      return;
+    }
+    setShowCreateSheet(true);
+  };
+
+  const handleOpenRequest = (meal) => {
+    if (!user?.email) {
+      toast.error("Please sign in to request a meal.");
+      navigate(createPageUrl("Login"));
+      return;
+    }
+    if (meal?.created_by === user.email) {
+      toast.error("You can't request your own meal.");
+      return;
+    }
+    setSelectedMeal(meal);
   };
 
   const toRad = (deg) => (deg * Math.PI) / 180;
@@ -181,14 +365,6 @@ export default function Home() {
       a: "Yes. This is free community sharing. We do not process payments, tips, or delivery fees.",
     },
     {
-      q: "Who’s responsible for food safety?",
-      a: "Hosts and guests participate at their own discretion. We don’t verify food or assume responsibility for safety.",
-    },
-    {
-      q: "Is this a delivery service?",
-      a: "No. This is a community social platform. Hosts and guests coordinate pickup directly.",
-    },
-    {
       q: "How do I request a meal?",
       a: "Sign in, open a meal, and send a request. The host will confirm and coordinate with you.",
     },
@@ -197,8 +373,42 @@ export default function Home() {
       a: "Create a meal with date, time, portions, and location. Respond to requests from the community.",
     },
     {
-      q: "What about dietary needs?",
-      a: "Check the meal’s dietary info and ask the host in messages if you need more details.",
+      q: "Who’s responsible for food safety?",
+      a: "Hosts and guests participate at their own discretion. See our policies for details.",
+      link: "/policies#disclaimer",
+    },
+  ];
+
+  const testimonials = [
+    {
+      quote: "I met neighbors I’d never talked to before. Sharing samosas on SharePlate felt like a potluck every week.",
+      name: "Priya K.",
+      role: "Home Cook",
+      location: "Herndon, VA",
+    },
+    {
+      quote: "We hosted a pasta night and gave away leftovers. Zero waste, new friends. It’s perfect.",
+      name: "Marco D.",
+      role: "Host",
+      location: "Seattle, WA",
+    },
+    {
+      quote: "Picked up a vegan chili on a busy day—free, friendly, and fast. Love the no-pay, community vibe.",
+      name: "Taylor S.",
+      role: "Guest",
+      location: "Austin, TX",
+    },
+    {
+      quote: "I listed extra portions after meal prep. People were so grateful—it turned into weekly swaps.",
+      name: "Jenna L.",
+      role: "Meal Prepper",
+      location: "San Jose, CA",
+    },
+    {
+      quote: "As a student, I appreciate home-cooked meals without delivery apps. It feels safe and neighborly.",
+      name: "Omar R.",
+      role: "Student",
+      location: "Boston, MA",
     },
   ];
 
@@ -244,7 +454,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button
                 size="lg"
-                onClick={() => setShowCreateSheet(true)}
+                onClick={handleOpenCreate}
                 className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-8 h-14 text-base shadow-lg shadow-slate-900/20"
               >
                 <Plus className="w-5 h-5 mr-2" />
@@ -370,6 +580,8 @@ export default function Home() {
                   <MealCard 
                     meal={meal} 
                     onRequestMeal={setSelectedMealForDetails}
+                    onEdit={handleEditMeal}
+                    onDelete={handleDeleteMeal}
                     isOwn={user?.email === meal.created_by}
                     averageRating={mealRatings[meal.id] ? mealRatings[meal.id].total / mealRatings[meal.id].count : null}
                     reviewCount={mealRatings[meal.id]?.count || 0}
@@ -386,7 +598,7 @@ export default function Home() {
             <h3 className="text-xl font-semibold text-slate-900 mb-2">No meals available</h3>
             <p className="text-slate-500 mb-6">Be the first to share a homemade meal!</p>
             <Button
-              onClick={() => setShowCreateSheet(true)}
+              onClick={handleOpenCreate}
               className="bg-slate-900 hover:bg-slate-800 rounded-full px-6"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -394,6 +606,41 @@ export default function Home() {
             </Button>
           </div>
         )}
+      </div>
+
+      {/* Testimonials */}
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-6 md:p-8 overflow-hidden">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-amber-600 font-semibold">Voices from the table</p>
+              <h2 className="text-2xl font-bold text-slate-900">What SharePlate feels like</h2>
+            </div>
+          </div>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 w-16 pointer-events-none bg-gradient-to-r from-white to-transparent" />
+            <div className="absolute inset-y-0 right-0 w-16 pointer-events-none bg-gradient-to-l from-white to-transparent" />
+            <motion.div
+              className="flex gap-4"
+              animate={{ x: ['0%', '-50%'] }}
+              transition={{ repeat: Infinity, duration: 28, ease: "linear" }}
+              style={{ width: 'max-content' }}
+            >
+              {[...testimonials, ...testimonials].map((t, idx) => (
+                <div
+                  key={idx}
+                  className="min-w-[260px] max-w-[280px] bg-slate-50 border border-slate-100 rounded-2xl p-4 shadow-[0_6px_20px_rgba(0,0,0,0.04)]"
+                >
+                  <p className="text-slate-800 text-sm leading-relaxed mb-4">“{t.quote}”</p>
+                  <div className="text-sm font-semibold text-slate-900">{t.name}</div>
+                  <div className="text-xs text-slate-500">
+                    {t.role} · {t.location}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* FAQ Section */}
@@ -411,22 +658,48 @@ export default function Home() {
                   <span className="font-semibold text-slate-900">{item.q}</span>
                   <span className="text-slate-400 group-open:rotate-180 transition-transform">⌄</span>
                 </summary>
-                <p className="text-sm text-slate-600 mt-2 leading-relaxed">{item.a}</p>
+                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                  {item.a}
+                  {item.link && (
+                    <>
+                      {" "}
+                      <a href={item.link} className="text-amber-600 font-semibold hover:underline">
+                        View Policies
+                      </a>
+                    </>
+                  )}
+                </p>
               </details>
             ))}
+            <div className="text-sm text-slate-600">
+              Want the full details?{" "}
+              <a href="/policies" className="text-amber-600 font-semibold hover:underline">
+                View Policies
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Create Meal Sheet */}
-      <Sheet open={showCreateSheet} onOpenChange={setShowCreateSheet}>
+      <Sheet
+        open={showCreateSheet}
+        onOpenChange={(open) => {
+          setShowCreateSheet(open);
+          if (!open) setEditingMeal(null);
+        }}
+      >
         <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
           <SheetHeader className="mb-6">
-            <SheetTitle className="text-2xl">Share a Meal</SheetTitle>
+            <SheetTitle className="text-2xl">{editingMeal ? "Edit Meal" : "Share a Meal"}</SheetTitle>
           </SheetHeader>
           <CreateMealForm
-            onSubmit={handleCreateMeal}
-            onCancel={() => setShowCreateSheet(false)}
+            initialData={editingMeal}
+            onSubmit={handleCreateOrUpdateMeal}
+            onCancel={() => {
+              setEditingMeal(null);
+              setShowCreateSheet(false);
+            }}
             isSubmitting={isSubmitting}
           />
         </SheetContent>
@@ -437,7 +710,8 @@ export default function Home() {
         meal={selectedMealForDetails}
         open={!!selectedMealForDetails}
         onClose={() => setSelectedMealForDetails(null)}
-        onRequestMeal={setSelectedMeal}
+        onRequestMeal={handleOpenRequest}
+        currentUserEmail={user?.email}
       />
 
       {/* Request Modal */}

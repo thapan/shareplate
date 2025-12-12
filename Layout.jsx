@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { mockApi } from './mockApi';
+import { supabase } from "@/src/lib/supabaseClient";
 import { DEMO_USER, getStoredUser, setStoredUser } from './auth';
+import { signOut, getSession } from "@/src/lib/authClient";
 import { Button } from "@/Components/ui/button";
 import {
   DropdownMenu,
@@ -11,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
-import { ChefHat, User, LogOut, Utensils, Menu, X, Users, MessageSquare } from "lucide-react";
+import { ChefHat, LogOut, Utensils, Menu, X, Users, MessageSquare, ShieldCheck } from "lucide-react";
 
 function LogoMark({ size = 44 }) {
   return (
@@ -89,6 +90,19 @@ export default function Layout({ children }) {
   const [user, setUser] = useState(() => getStoredUser());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const navigate = useNavigate();
+  const cooksPath = user ? createPageUrl("CookProfiles") : createPageUrl("Login");
+
+  const hydrateUser = async (authedEmail, metadataName) => {
+    if (!authedEmail) return null;
+    const { data: profile } = await supabase.from('users').select('*').eq('email', authedEmail).maybeSingle();
+    const full_name = profile?.full_name || metadataName || 'User';
+    const profile_picture = profile?.profile_picture;
+    const hydrated = { email: authedEmail, full_name, profile_picture };
+    setStoredUser(hydrated);
+    setUser(hydrated);
+    return hydrated;
+  };
 
   const handleSignIn = (u = DEMO_USER) => {
     setStoredUser(u);
@@ -98,18 +112,48 @@ export default function Layout({ children }) {
   const handleSignOut = () => {
     setStoredUser(null);
     setUser(null);
+    signOut();
+    navigate(createPageUrl("Login"));
   };
+
+  // Hydrate user from Supabase session/profile
+  useEffect(() => {
+    const loadUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      const authedEmail = data?.session?.user?.email;
+      const metadataName = data?.session?.user?.user_metadata?.full_name;
+      if (authedEmail) await hydrateUser(authedEmail, metadataName);
+    };
+    loadUser();
+  }, []);
+
+  // Keep nav in sync with auth changes (sign in/out) without page reload
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user?.email) {
+        hydrateUser(session.user.email, session.user.user_metadata?.full_name);
+      }
+      if (event === 'SIGNED_OUT') {
+        setStoredUser(null);
+        setUser(null);
+      }
+    });
+    return () => listener?.subscription?.unsubscribe();
+  }, []);
 
   // Fetch unread message count
   useEffect(() => {
     if (!user?.email) return;
 
     const fetchUnreadCount = async () => {
-      const messages = await mockApi.entities.Message.filter({ 
-        receiver_email: user.email,
-        is_read: false 
-      });
-      setUnreadCount(messages.length);
+      const { count, error } = await supabase
+        .from('messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('receiver_email', user.email)
+        .eq('is_read', false);
+      if (!error && typeof count === 'number') {
+        setUnreadCount(count);
+      }
     };
 
     fetchUnreadCount();
@@ -120,7 +164,7 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-100">
+      <nav className="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -138,8 +182,12 @@ export default function Layout({ children }) {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-2">
-              <Link to={createPageUrl("CookProfiles")}>
-                <Button variant="ghost" className="text-slate-600 hover:text-slate-900">
+              <Link to={cooksPath}>
+                <Button
+                  variant="ghost"
+                  className="text-slate-600 hover:text-slate-900"
+                  title={user ? "Browse cooks" : "Sign in required"}
+                >
                   <Users className="w-4 h-4 mr-2" />
                   Cooks
                 </Button>
@@ -168,16 +216,19 @@ export default function Layout({ children }) {
                   
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="gap-2">
-                      <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-slate-600" />
-                      </div>
-                      <span className="text-slate-700">{user.full_name?.split(' ')[0]}</span>
-                    </Button>
+                      <Button variant="ghost" className="gap-2 pr-1 pl-1.5">
+                        <div className="w-9 h-9 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                          {user.full_name ? user.full_name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="hidden sm:flex flex-col items-start leading-tight text-left max-w-[160px]">
+                          <span className="text-slate-900 font-semibold truncate">{user.full_name || 'Account'}</span>
+                          <span className="text-xs text-slate-500 truncate">{user.email}</span>
+                        </div>
+                      </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 rounded-xl">
+                    <DropdownMenuContent align="end" className="w-56 rounded-xl">
                       <div className="px-3 py-2">
-                        <p className="font-medium text-slate-900">{user.full_name}</p>
+                        <p className="font-semibold text-slate-900 truncate">{user.full_name || user.email}</p>
                         <p className="text-sm text-slate-500 truncate">{user.email}</p>
                       </div>
                       <DropdownMenuSeparator />
@@ -223,15 +274,18 @@ export default function Layout({ children }) {
           {mobileMenuOpen && (
             <div className="md:hidden py-4 border-t border-slate-100">
               <Link 
-                to={createPageUrl("CookProfiles")} 
+                to={cooksPath} 
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Button variant="ghost" className="w-full justify-start">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  title={user ? "Browse cooks" : "Sign in required"}
+                >
                   <Users className="w-4 h-4 mr-2" />
                   Cooks
                 </Button>
               </Link>
-              
               {user ? (
                 <div className="space-y-2 mt-2">
                   <div className="px-3 py-2 mb-3">
@@ -299,6 +353,8 @@ export default function Layout({ children }) {
           </div>
           <p className="text-sm text-slate-500">
             Community platform for free sharing. No payments or delivery. Participation is at your discretion and we are not responsible for food safety.
+            {" "}
+            <Link to={createPageUrl("Policies")} className="text-amber-600 font-semibold hover:underline">Policies</Link>
           </p>
         </div>
       </footer>

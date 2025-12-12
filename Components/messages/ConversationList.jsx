@@ -45,7 +45,7 @@ export default function ConversationList({ conversations, selectedConversation, 
                     </h4>
                     {lastMessage && (
                       <span className="text-xs text-slate-400 flex-shrink-0">
-                        {formatDistanceToNow(new Date(lastMessage.created_date), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(lastMessage.created_at || lastMessage.created_date), { addSuffix: true })}
                       </span>
                     )}
                   </div>

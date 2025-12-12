@@ -39,7 +39,7 @@ export default function MessageThread({ messages, currentUserEmail }) {
               
               <div className="flex items-center gap-1 mt-1 px-1">
                 <span className="text-xs text-slate-400">
-                  {format(new Date(message.created_date), 'h:mm a')}
+                  {format(new Date(message.created_at || message.created_date), 'h:mm a')}
                 </span>
                 {isSent && (
                   <span className="text-slate-400">

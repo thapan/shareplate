@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
 const SelectContext = createContext(null);
@@ -6,9 +6,27 @@ const SelectContext = createContext(null);
 export function Select({ value, defaultValue = '', onValueChange, children }) {
   const state = useState(value ?? defaultValue);
   const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (!containerRef.current) return;
+      if (!containerRef.current.contains(e.target)) setOpen(false);
+    };
+    const handleKey = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, []);
+
   return (
     <SelectContext.Provider value={{ state, onValueChange, open, setOpen }}>
-      <div className="relative">{children}</div>
+      <div className="relative" ref={containerRef}>{children}</div>
     </SelectContext.Provider>
   );
 }
@@ -41,7 +59,13 @@ export function SelectContent({ className = '', children }) {
   const { open } = useContext(SelectContext);
   if (!open) return null;
   return (
-    <div className={clsx('absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg', className)}>
+    <div
+      className={clsx(
+        'absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto',
+        className
+      )}
+      role="listbox"
+    >
       {children}
     </div>
   );

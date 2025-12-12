@@ -1,27 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { mockApi } from '../mockApi';
 import { useQuery } from '@tanstack/react-query';
 import { Input } from "@/Components/ui/input";
 import { Search, ChefHat } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CookProfileCard from "@/Components/cooks/CookProfileCard";
+import { supabase } from "@/src/lib/supabaseClient";
 
 export default function CookProfiles() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: allMeals = [], isLoading: loadingMeals } = useQuery({
     queryKey: ['all-meals-for-cooks'],
-    queryFn: () => mockApi.entities.Meal.list('-created_date', 1000),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('meals')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1000);
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   const { data: allReviews = [], isLoading: loadingReviews } = useQuery({
     queryKey: ['all-reviews-for-cooks'],
-    queryFn: () => mockApi.entities.Review.list('-created_date', 1000),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1000);
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   const { data: allUsers = [], isLoading: loadingUsers } = useQuery({
     queryKey: ['all-users'],
-    queryFn: () => mockApi.entities.User.list(),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('users').select('*');
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   // Get unique cook emails from meals

@@ -114,7 +114,11 @@ export default function MealRequestModal({ meal, open, onClose, onSubmit, isSubm
               className="min-h-[100px] rounded-xl border-slate-200 focus:border-slate-400 focus:ring-slate-400 resize-none"
             />
           </div>
-          
+
+          <div className="bg-amber-50/80 border border-amber-100 text-amber-800 text-xs rounded-lg px-3 py-2">
+            Community sharing only—no payments or delivery. <a href="/policies#disclaimer" className="underline font-semibold">See full policies</a>.
+          </div>
+
           {/* Actions */}
           <div className="flex gap-3 pt-2">
             <Button

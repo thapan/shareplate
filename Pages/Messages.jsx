@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { mockApi } from '../mockApi';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { ChefHat, MessageSquare, ArrowLeft } from "lucide-react";
@@ -8,10 +7,12 @@ import ConversationList from "@/Components/messages/ConversationList";
 import MessageThread from "@/Components/messages/MessageThread";
 import MessageComposer from "@/Components/messages/MessageComposer";
 import { getStoredUser, DEMO_USER } from '../auth';
+import { supabase } from "@/src/lib/supabaseClient";
+import { toast } from "sonner";
 
 export default function Messages() {
   const [user, setUser] = useState(() => getStoredUser() || DEMO_USER);
-  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [selectedEmail, setSelectedEmail] = useState(null);
   const queryClient = useQueryClient();
 
   // Fetch all messages involving the user
@@ -19,11 +20,13 @@ export default function Messages() {
     queryKey: ['messages', user?.email],
     queryFn: async () => {
       if (!user?.email) return [];
-      const sent = await mockApi.entities.Message.filter({ sender_email: user.email }, '-created_date');
-      const received = await mockApi.entities.Message.filter({ receiver_email: user.email }, '-created_date');
-      return [...sent, ...received].sort((a, b) => 
-        new Date(a.created_date) - new Date(b.created_date)
-      );
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .or(`sender_email.eq.${user.email},receiver_email.eq.${user.email}`)
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return data || [];
     },
     enabled: !!user?.email,
     refetchInterval: 5000, // Poll every 5 seconds for new messages
@@ -32,15 +35,21 @@ export default function Messages() {
   // Fetch all users for profile info
   const { data: allUsers = [] } = useQuery({
     queryKey: ['all-users-messages'],
-    queryFn: () => mockApi.entities.User.list(),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('users').select('*');
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   // Mark messages as read
   const markAsReadMutation = useMutation({
     mutationFn: async (messageIds) => {
-      await Promise.all(
-        messageIds.map(id => mockApi.entities.Message.update(id, { is_read: true }))
-      );
+      const { error } = await supabase
+        .from('messages')
+        .update({ is_read: true })
+        .in('id', messageIds);
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
@@ -49,14 +58,20 @@ export default function Messages() {
 
   // Send message
   const sendMessageMutation = useMutation({
-    mutationFn: (messageData) => mockApi.entities.Message.create(messageData),
+    mutationFn: async (messageData) => {
+      const { error } = await supabase.from('messages').insert(messageData);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
+    },
+    onError: () => {
+      toast.error("Could not send message. Please try again.");
     },
   });
 
   // Group messages into conversations
-  const conversations = React.useMemo(() => {
+  const conversations = useMemo(() => {
     if (!user?.email) return [];
     
     const convMap = new Map();
@@ -82,9 +97,15 @@ export default function Messages() {
     return Array.from(convMap.values()).sort((a, b) => {
       const lastA = a.messages[a.messages.length - 1];
       const lastB = b.messages[b.messages.length - 1];
-      return new Date(lastB.created_date) - new Date(lastA.created_date);
+      return new Date(lastB.created_at || lastB.created_date) - new Date(lastA.created_at || lastA.created_date);
     });
   }, [allMessages, user?.email, allUsers]);
+
+  // Derive active conversation from selectedEmail so new messages hydrate automatically
+  const selectedConversation = useMemo(
+    () => conversations.find((c) => c.otherUser.email === selectedEmail) || null,
+    [conversations, selectedEmail]
+  );
 
   // Mark messages as read when conversation is selected
   useEffect(() => {
@@ -97,17 +118,17 @@ export default function Messages() {
         markAsReadMutation.mutate(unreadMessages);
       }
     }
-  }, [selectedConversation?.otherUser.email]);
+  }, [selectedConversation?.otherUser.email, selectedConversation?.messages, user?.email]);
 
   const handleSendMessage = async (content) => {
     if (!selectedConversation || !user) return;
-    
+    if (!content.trim()) return;
     await sendMessageMutation.mutateAsync({
       sender_email: user.email,
       sender_name: user.full_name,
       receiver_email: selectedConversation.otherUser.email,
       receiver_name: selectedConversation.otherUser.full_name,
-      content,
+      content: content.trim(),
       is_read: false,
     });
   };
@@ -157,12 +178,12 @@ export default function Messages() {
                     ))}
                   </div>
                 ) : conversations.length > 0 ? (
-                  <ConversationList
-                    conversations={conversations}
-                    selectedConversation={selectedConversation}
-                    onSelectConversation={setSelectedConversation}
-                    currentUserEmail={user.email}
-                  />
+                    <ConversationList
+                      conversations={conversations}
+                      selectedConversation={selectedConversation}
+                      onSelectConversation={(conv) => setSelectedEmail(conv?.otherUser?.email || null)}
+                      currentUserEmail={user.email}
+                    />
                 ) : (
                   <div className="text-center py-12">
                     <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-3" />

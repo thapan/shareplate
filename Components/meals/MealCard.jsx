@@ -2,11 +2,12 @@ import React from 'react';
 import { Card, CardContent } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
 import { Button } from "@/Components/ui/button";
-import { Calendar, Clock, MapPin, Users, ChefHat, Star } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, ChefHat, Star, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import RatingStars from "../reviews/RatingStars";
+import { supabase } from "@/src/lib/supabaseClient";
 
 const cuisineEmojis = {
   italian: "🍝",
@@ -29,9 +30,76 @@ const dietaryColors = {
   "nut-free": "bg-orange-50 text-orange-700 border-orange-200"
 };
 
-export default function MealCard({ meal, onRequestMeal, isOwn = false, averageRating = null, reviewCount = 0 }) {
+const parseStoragePath = (rawUrl) => {
+  if (!rawUrl) return null;
+  const direct = rawUrl.match(/object\/public\/([^/]+)\/([^?]+)(?:\?.*)?$/);
+  if (direct) return { bucket: direct[1], path: direct[2] };
+  const render = rawUrl.match(/render\/image\/public\/([^/]+)\/([^?]+)(?:\?.*)?$/);
+  if (render) return { bucket: render[1], path: render[2] };
+  if (!rawUrl.startsWith("http")) {
+    return { bucket: null, path: rawUrl.replace(/^\/+/, "") };
+  }
+  return null;
+};
+
+const resolveImageUrl = (rawUrl) => {
+  if (!rawUrl) return "";
+  const bucket = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || 'meal-images';
+  const parsed = parseStoragePath(rawUrl);
+  if (parsed) {
+    const targetBucket = parsed.bucket || bucket;
+    const { data } = supabase.storage.from(targetBucket).getPublicUrl(parsed.path, {
+      transform: { width: 900, quality: 75 },
+    });
+    return data?.publicUrl || rawUrl;
+  }
+  return rawUrl; // full external URL
+};
+
+function LogoPlaceholder() {
+  return (
+    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 via-amber-400 to-amber-300 flex items-center justify-center shadow-md ring-4 ring-white/70">
+      <svg
+        width="36"
+        height="36"
+        viewBox="0 0 64 64"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle cx="32" cy="32" r="30" fill="url(#mcPlate)" />
+        <circle cx="32" cy="32" r="18" fill="none" stroke="#fff7ed" strokeWidth="2.2" />
+        <g transform="translate(10 12)">
+          <path d="M12 30c0 5.5 6 10 14 10s14-4.5 14-10H12Z" fill="#fde68a" stroke="#f59e0b" strokeWidth="2" />
+          <path d="M17 28h18" stroke="#f59e0b" strokeWidth="2" />
+          <circle cx="23" cy="22" r="2" fill="#fbbf24" />
+          <circle cx="31" cy="21" r="2" fill="#f59e0b" />
+          <path d="M24 25c.6-.6 1.5-.6 2 0l1 1 1-1c.6-.6 1.5-.6 2 0 .6.6.6 1.5 0 2.1l-2 2c-.6.6-1.5.6-2.1 0l-2-2c-.6-.6-.6-1.5.1-2.1Z" fill="#f43f5e" />
+        </g>
+        <defs>
+          <linearGradient id="mcPlate" x1="12" y1="10" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#f97316" />
+            <stop offset="1" stopColor="#f59e0b" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  );
+}
+
+export default function MealCard({ meal, onRequestMeal, onEdit, onDelete, isOwn = false, averageRating = null, reviewCount = 0 }) {
   const portionsLeft = meal.portions_available - (meal.portions_claimed || 0);
   const isFull = portionsLeft <= 0;
+  const [imageError, setImageError] = React.useState(false);
+  const [imageSrc, setImageSrc] = React.useState(() => resolveImageUrl(meal.image_url));
+  const [retried, setRetried] = React.useState(false);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    setImageSrc(resolveImageUrl(meal.image_url));
+    setImageError(false);
+    setImageLoaded(false);
+    setRetried(false);
+  }, [meal.image_url]);
   
   const handleClick = () => {
     onRequestMeal(meal);
@@ -43,19 +111,45 @@ export default function MealCard({ meal, onRequestMeal, isOwn = false, averageRa
       onClick={handleClick}
     >
       <div className="relative">
-        {meal.image_url ? (
-          <div className="aspect-[4/3] overflow-hidden">
+        <div className="aspect-[4/3] overflow-hidden relative">
+          {(!imageSrc || imageError || !imageLoaded) && (
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-100 flex items-center justify-center">
+              <LogoPlaceholder />
+            </div>
+          )}
+          {imageSrc && !imageError && (
             <img 
-              src={meal.image_url} 
+              src={imageSrc} 
               alt={meal.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              className={`w-full h-full object-cover object-center bg-white transition-transform duration-700 ${imageLoaded ? 'group-hover:scale-105 opacity-100' : 'opacity-0'}`}
+              loading="lazy"
+              onLoad={() => setImageLoaded(true)}
+              onError={async () => {
+                if (retried) {
+                  setImageError(true);
+                  return;
+                }
+                setRetried(true);
+                setImageLoaded(false);
+                try {
+                const parsed = parseStoragePath(imageSrc);
+                if (parsed) {
+                  const bucket = parsed.bucket || import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || 'meal-images';
+                  const path = parsed.path;
+                  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 3600);
+                  if (!error && data?.signedUrl) {
+                    setImageSrc(data.signedUrl);
+                    return;
+                  }
+                }
+                setImageError(true);
+              } catch {
+                setImageError(true);
+              }
+            }}
             />
-          </div>
-        ) : (
-          <div className="aspect-[4/3] bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-100 flex items-center justify-center">
-            <span className="text-6xl">{cuisineEmojis[meal.cuisine_type] || "🍽️"}</span>
-          </div>
-        )}
+          )}
+        </div>
         
         {/* Status overlay */}
         {isFull && (
@@ -153,10 +247,38 @@ export default function MealCard({ meal, onRequestMeal, isOwn = false, averageRa
           </div>
           
           {isOwn && (
-            <div className="pt-2">
+            <div className="pt-2 flex items-center gap-2">
               <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
                 Your Meal
               </Badge>
+              {onEdit && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 px-3 text-slate-600 hover:text-slate-900"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(meal);
+                  }}
+                >
+                  <Pencil className="w-4 h-4 mr-1" />
+                  Edit
+                </Button>
+              )}
+              {onDelete && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 px-3 text-red-600 hover:text-red-700"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(meal);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  Delete
+                </Button>
+              )}
             </div>
           )}
         </div>
