@@ -222,14 +222,13 @@ export default function Layout({ children }) {
                         </div>
                         <div className="hidden sm:flex flex-col items-start leading-tight text-left max-w-[160px]">
                           <span className="text-slate-900 font-semibold truncate">{user.full_name || 'Account'}</span>
-                          <span className="text-xs text-slate-500 truncate">{user.email}</span>
                         </div>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 rounded-xl">
                       <div className="px-3 py-2">
-                        <p className="font-semibold text-slate-900 truncate">{user.full_name || user.email}</p>
-                        <p className="text-sm text-slate-500 truncate">{user.email}</p>
+                        <p className="font-semibold text-slate-900 truncate">{user.full_name || 'Account'}</p>
+                        {user.email && <p className="text-xs text-slate-500 truncate">{user.email}</p>}
                       </div>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
@@ -289,8 +288,8 @@ export default function Layout({ children }) {
               {user ? (
                 <div className="space-y-2 mt-2">
                   <div className="px-3 py-2 mb-3">
-                    <p className="font-medium text-slate-900">{user.full_name}</p>
-                    <p className="text-sm text-slate-500">{user.email}</p>
+                    <p className="font-medium text-slate-900">{user.full_name || 'Account'}</p>
+                    {user.email && <p className="text-xs text-slate-500 truncate">{user.email}</p>}
                   </div>
                   <Link 
                     to={createPageUrl("Messages")} 

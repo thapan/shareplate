@@ -18,6 +18,7 @@ import MealCard from "@/Components/meals/MealCard";
 import MealRequestModal from "@/Components/meals/MealRequestModal";
 import MealDetailsModal from "@/Components/meals/MealDetailsModal";
 import CreateMealForm from "@/Components/meals/CreateMealForm";
+import LoadingSpinner, { SkeletonCard } from "@/Components/LoadingSpinner";
 import { DEMO_USER, getStoredUser, setStoredUser } from '../auth';
 import { createPageUrl } from '@/utils';
 import { Badge } from "@/Components/ui/badge";
@@ -560,7 +561,7 @@ export default function Home() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white rounded-2xl h-96 animate-pulse" />
+              <SkeletonCard key={i} />
             ))}
           </div>
         ) : filteredMeals.length > 0 ? (

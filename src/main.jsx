@@ -11,6 +11,7 @@ import Login from '@/Pages/Login';
 import Signup from '@/Pages/Signup';
 import MyMeals from '@/Pages/MyMeals';
 import Policies from '@/Pages/Policies';
+import ErrorBoundary from '@/Components/ErrorBoundary';
 import './styles.css';
 import { supabase } from '@/src/lib/supabaseClient';
 import { getStoredUser, setStoredUser } from '@/auth';
@@ -61,37 +62,41 @@ function RequireAuth({ children }) {
 
 function AppRouter() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/cooks" element={<CookProfiles />} />
-            <Route path="/cook" element={<CookProfile />} />
-            <Route
-              path="/messages"
-              element={
-                <RequireAuth>
-                  <Messages />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/my-meals"
-              element={
-                <RequireAuth>
-                  <MyMeals />
-                </RequireAuth>
-              }
-            />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/policies" element={<Policies />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Layout>
+            <ErrorBoundary>
+              <Routes>
+                <Route path="/" element={<ErrorBoundary><Home /></ErrorBoundary>} />
+                <Route path="/cooks" element={<ErrorBoundary><CookProfiles /></ErrorBoundary>} />
+                <Route path="/cook" element={<ErrorBoundary><CookProfile /></ErrorBoundary>} />
+                <Route
+                  path="/messages"
+                  element={
+                    <RequireAuth>
+                      <ErrorBoundary><Messages /></ErrorBoundary>
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/my-meals"
+                  element={
+                    <RequireAuth>
+                      <ErrorBoundary><MyMeals /></ErrorBoundary>
+                    </RequireAuth>
+                  }
+                />
+                <Route path="/login" element={<ErrorBoundary><Login /></ErrorBoundary>} />
+                <Route path="/signup" element={<ErrorBoundary><Signup /></ErrorBoundary>} />
+                <Route path="/policies" element={<ErrorBoundary><Policies /></ErrorBoundary>} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </ErrorBoundary>
+          </Layout>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

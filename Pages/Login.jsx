@@ -36,7 +36,7 @@ export default function Login() {
 
   const isValidEmail = (value) => /\S+@\S+\.\S+/.test(value);
 
-  const handleSendOtp = (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
     if (!form.email || !form.full_name) {
       setStatus({ sending: false, verifying: false, error: 'Please enter your name and email.' });
@@ -46,19 +46,32 @@ export default function Login() {
       setStatus({ sending: false, verifying: false, error: 'Enter a valid email address.' });
       return;
     }
+    
     setStatus({ sending: true, verifying: false, error: '' });
+    
     try {
-      sendOtp(form.email).then(({ error }) => {
-        if (error) throw error;
-        setOtpSent(true);
-        setResendTimer(30);
-        setStatus({ sending: false, verifying: false, error: '' });
-      }).catch((err) => {
-        setStatus({ sending: false, verifying: false, error: err.message || 'Could not send code.' });
-      });
+      const { error } = await sendOtp(form.email);
+      if (error) {
+        // Handle specific error types
+        if (error.message?.includes('network') || error.message?.includes('fetch')) {
+          throw new Error('Network error. Please check your connection and try again.');
+        }
+        if (error.message?.includes('rate limit')) {
+          throw new Error('Too many requests. Please wait a moment before trying again.');
+        }
+        throw error;
+      }
+      
+      setOtpSent(true);
+      setResendTimer(30);
+      setStatus({ sending: false, verifying: false, error: '' });
     } catch (err) {
-      setStatus({ sending: false, verifying: false, error: err.message || 'Could not send code.' });
-      return;
+      console.error('OTP send error:', err);
+      setStatus({ 
+        sending: false, 
+        verifying: false, 
+        error: err.message || 'Could not send code. Please try again.' 
+      });
     }
   };
 

@@ -12,9 +12,10 @@ import {
 } from "@/Components/ui/select";
 import { Calendar } from "@/Components/ui/calendar";
 import { Badge } from "@/Components/ui/badge";
-import { Calendar as CalendarIcon, Upload, X, Clock } from "lucide-react";
+import { Calendar as CalendarIcon, Upload, X, Clock, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/src/lib/supabaseClient";
+import { sanitizeAndValidateImage } from "@/lib/fileValidation";
 
 const cuisines = [
   { value: "italian", label: "Italian", emoji: "🍝" },
@@ -162,11 +163,19 @@ export default function CreateMealForm({ onSubmit, onCancel, isSubmitting, initi
     
     setUploadError("");
     setIsUploading(true);
+    
     try {
+      // Validate file security first
+      const validation = await sanitizeAndValidateImage(file);
+      if (!validation.isValid) {
+        throw new Error(validation.errors.join(', '));
+      }
+      
       if (lastPreviewUrl) {
         URL.revokeObjectURL(lastPreviewUrl);
         setLastPreviewUrl("");
       }
+      
       const { file: compressedFile, previewUrl: localPreview } = await compressImage(file);
       setPreviewUrl(localPreview);
       setLastPreviewUrl(localPreview);
@@ -174,8 +183,8 @@ export default function CreateMealForm({ onSubmit, onCancel, isSubmitting, initi
       setImageSrc(localPreview);
       setImageError(false);
     } catch (err) {
-      console.error("Compression failed:", err);
-      setUploadError("Could not process the image. Please try another file.");
+      console.error("Image upload failed:", err);
+      setUploadError(err.message || "Could not process the image. Please try another file.");
       setPreviewUrl("");
       setImageFile(null);
       setImageSrc("");
