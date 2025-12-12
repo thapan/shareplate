@@ -71,7 +71,7 @@ function AppRouter() {
               <Routes>
                 <Route path="/" element={<ErrorBoundary><Home /></ErrorBoundary>} />
                 <Route path="/cooks" element={<ErrorBoundary><CookProfiles /></ErrorBoundary>} />
-                <Route path="/cook" element={<ErrorBoundary><CookProfile /></ErrorBoundary>} />
+                <Route path="/cooks/:id" element={<ErrorBoundary><CookProfile /></ErrorBoundary>} />
                 <Route
                   path="/messages"
                   element={

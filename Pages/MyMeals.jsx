@@ -254,12 +254,12 @@ export default function MyMeals() {
     <div className="max-w-5xl mx-auto px-4 py-10">
       <div className="flex items-center justify-between gap-4 mb-8">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-amber-600 font-semibold">My Meals</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-orange-600 font-semibold">My Meals</p>
           <h1 className="text-3xl font-bold text-slate-900">Manage what you’re sharing</h1>
           <p className="text-slate-600">Edit, publish, or remove your shared meals in one place.</p>
         </div>
         <Button
-          className="bg-slate-900 hover:bg-slate-800 rounded-full px-5"
+          className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-full px-5"
           onClick={() => {
             setEditingMeal(null);
             setShowSheet(true);
@@ -285,7 +285,7 @@ export default function MyMeals() {
         </div>
         <div className="p-4 bg-white border border-slate-100 rounded-xl shadow-sm">
           <p className="text-xs text-slate-500">Portions claimed</p>
-          <p className="text-2xl font-semibold text-amber-600">{stats.claimed}</p>
+          <p className="text-2xl font-semibold text-orange-600">{stats.claimed}</p>
         </div>
       </div>
 
@@ -299,7 +299,7 @@ export default function MyMeals() {
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-8 text-center">
           <p className="text-lg font-semibold text-slate-900 mb-2">No meals yet</p>
           <p className="text-slate-600 mb-4">Share your first meal to connect with neighbors.</p>
-          <Button className="bg-slate-900 hover:bg-slate-800 rounded-full px-5" onClick={() => setShowSheet(true)}>
+          <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-full px-5" onClick={() => setShowSheet(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Share a Meal
           </Button>

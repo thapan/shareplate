@@ -32,3 +32,12 @@ button {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Stable logo animations */
+.logo-stable {
+  transition: transform 0.3s ease;
+}
+
+.logo-stable:hover {
+  transform: scale(1.05);
+}

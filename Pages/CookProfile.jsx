@@ -4,7 +4,7 @@ import { Button } from "@/Components/ui/button";
 import { Card, CardContent } from "@/Components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { ChefHat, Star, ArrowLeft, Utensils, MessageSquare, Send } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import RatingStars from "@/Components/reviews/RatingStars";
@@ -18,14 +18,17 @@ import ReviewForm from "@/Components/reviews/ReviewForm";
 import { toast } from "sonner";
 
 export default function CookProfile() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const cookEmail = urlParams.get('email');
+  const params = useParams();
+  const location = useLocation();
+  const urlParams = new URLSearchParams(location.search);
+  const cookEmail = params.id ? decodeURIComponent(params.id) : urlParams.get('email');
   const [user, setUser] = useState(() => getStoredUser() || DEMO_USER);
   const [selectedMealForDetails, setSelectedMealForDetails] = useState(null);
   const [selectedMeal, setSelectedMeal] = useState(null);
+  const queryClient = useQueryClient();
 
   const handleSendMessage = () => {
-    if (!user) setUser(demoUser);
+    if (!user) setUser(DEMO_USER);
     window.location.href = createPageUrl("Messages") + `?start=${encodeURIComponent(cookEmail)}`;
   };
 
@@ -95,25 +98,7 @@ export default function CookProfile() {
     : 0;
 
   const isLoading = loadingCook || loadingMeals || loadingReviews;
-
-  if (!cookEmail) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-500">Invalid cook profile</p>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-slate-200 border-t-slate-600 rounded-full" />
-      </div>
-    );
-  }
-
   const cookName = cook?.full_name || cookMeals[0]?.cook_name || "Cook";
-  const queryClient = useQueryClient();
   const hasReviewedCook = user?.email && cookReviews.some((r) => r.reviewer_email === user.email && r.cook_email === cookEmail);
 
   const reviewCookMutation = useMutation({
@@ -138,6 +123,33 @@ export default function CookProfile() {
     },
     onError: (err) => toast.error(err?.message || "Could not submit review."),
   });
+
+  if (!cookEmail) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-slate-500">Invalid cook profile</p>
+      </div>
+    );
+  }
+
+  if (!isLoading && !cook && cookMeals.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 text-center">
+        <div>
+          <p className="text-xl font-semibold text-slate-900 mb-2">Cook not found</p>
+          <p className="text-slate-600">This cook profile may be private or no longer available.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-slate-200 border-t-slate-600 rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">

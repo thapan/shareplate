@@ -4,11 +4,11 @@ import { Badge } from "@/Components/ui/badge";
 import { User, ChefHat, Star } from 'lucide-react';
 import RatingStars from "../reviews/RatingStars";
 import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { createCookProfileUrl } from "@/utils";
 
 export default function CookProfileCard({ cook, mealCount, averageRating, reviewCount }) {
   return (
-    <Link to={createPageUrl("CookProfile") + `?email=${encodeURIComponent(cook.email)}`}>
+    <Link to={createCookProfileUrl(cook.email)}>
       <Card className="group overflow-hidden bg-white border-0 shadow-sm hover:shadow-xl transition-all duration-300 rounded-2xl cursor-pointer">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">

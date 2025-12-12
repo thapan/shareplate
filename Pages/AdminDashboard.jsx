@@ -140,29 +140,38 @@ export default function AdminDashboard() {
   const healthStatus = getBetaHealthStatus(betaMetrics);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-amber-50/20 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(249,115,22,0.08),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(249,115,22,0.06),transparent_50%)] pointer-events-none" />
+      <div className="relative max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">Beta Dashboard</h1>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-12 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg shadow-orange-500/20 flex items-center justify-center border border-orange-100/50">
+                  <Activity className="w-6 h-6 text-orange-500" />
+                </div>
+                <h1 className="text-3xl font-bold text-slate-900">Beta Dashboard</h1>
+              </div>
               <p className="text-slate-600">Essential metrics for beta success</p>
             </div>
             <div className="flex items-center gap-3">
-              <Badge className={`px-3 py-1 text-white bg-${healthStatus.color}-500`}>
+              <Badge className={`px-3 py-1 text-white bg-${healthStatus.color}-500 shadow-lg`}>
                 {healthStatus.status.toUpperCase()}
               </Badge>
-              <Badge className="bg-orange-500 text-white px-3 py-1">BETA</Badge>
+              <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1 shadow-lg">BETA</Badge>
             </div>
           </div>
         </div>
 
         {/* Critical Alerts */}
         {betaMetrics && (betaMetrics.bugReports > 0 || betaMetrics.satisfactionRate < 70) && (
-          <Card className="mb-6 border-red-200 bg-red-50">
+          <Card className="mb-6 border-red-200 bg-red-50/80 backdrop-blur-sm shadow-lg shadow-red-500/10">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                </div>
                 <div>
                   <h3 className="font-semibold text-red-900">Immediate Action Required</h3>
                   <div className="text-sm text-red-700">
@@ -177,7 +186,7 @@ export default function AdminDashboard() {
 
         {/* Essential Beta KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm shadow-lg shadow-slate-900/5 border-slate-100">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -190,12 +199,14 @@ export default function AdminDashboard() {
                   </p>
                   <p className="text-xs text-slate-500">Critical for beta success</p>
                 </div>
-                <Heart className="w-8 h-8 text-pink-500" />
+                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
+                  <Heart className="w-6 h-6 text-pink-500" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm shadow-lg shadow-slate-900/5 border-slate-100">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -203,12 +214,14 @@ export default function AdminDashboard() {
                   <p className="text-2xl font-bold text-blue-600">{betaMetrics?.weeklySignups || 0}</p>
                   <p className="text-xs text-slate-500">Growth momentum</p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-blue-500" />
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-blue-500" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm shadow-lg shadow-slate-900/5 border-slate-100">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -221,12 +234,14 @@ export default function AdminDashboard() {
                   </p>
                   <p className="text-xs text-slate-500">Must fix immediately</p>
                 </div>
-                <Bug className="w-8 h-8 text-red-500" />
+                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                  <Bug className="w-6 h-6 text-red-500" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm shadow-lg shadow-slate-900/5 border-slate-100">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -234,7 +249,9 @@ export default function AdminDashboard() {
                   <p className="text-2xl font-bold text-purple-600">{betaMetrics?.totalUsers || 0}</p>
                   <p className="text-xs text-slate-500">Beta community size</p>
                 </div>
-                <Users className="w-8 h-8 text-purple-500" />
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-purple-500" />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -242,7 +259,7 @@ export default function AdminDashboard() {
 
         {/* Beta Health Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm shadow-lg shadow-slate-900/5 border-slate-100">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="w-5 h-5" />
@@ -269,7 +286,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm shadow-lg shadow-slate-900/5 border-slate-100">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5" />
@@ -305,7 +322,7 @@ export default function AdminDashboard() {
           </TabsList>
 
           <TabsContent value="users">
-            <Card>
+            <Card className="bg-white/80 backdrop-blur-sm shadow-lg shadow-slate-900/5 border-slate-100">
               <CardHeader>
                 <CardTitle>Beta Users</CardTitle>
               </CardHeader>
@@ -314,7 +331,7 @@ export default function AdminDashboard() {
                   {betaMetrics?.users?.map((user) => (
                     <div key={user.id} className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                        <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
                           {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -342,7 +359,7 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="bugs">
-            <Card>
+            <Card className="bg-white/80 backdrop-blur-sm shadow-lg shadow-slate-900/5 border-slate-100">
               <CardHeader>
                 <CardTitle className="text-red-600">🚨 Critical Bug Reports</CardTitle>
               </CardHeader>
@@ -376,7 +393,7 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="feedback">
-            <Card>
+            <Card className="bg-white/80 backdrop-blur-sm shadow-lg shadow-slate-900/5 border-slate-100">
               <CardHeader>
                 <CardTitle>Recent User Feedback</CardTitle>
               </CardHeader>

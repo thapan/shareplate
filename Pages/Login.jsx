@@ -7,6 +7,7 @@ import { Label } from "@/Components/ui/label";
 import { DEMO_USER, setStoredUser } from '../auth';
 import { sendOtp, verifyOtp, getSession } from "@/src/lib/authClient";
 import { createPageUrl } from '@/utils';
+import { supabase } from "@/src/lib/supabaseClient";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function Login() {
   const [code, setCode] = useState('');
   const [status, setStatus] = useState({ sending: false, verifying: false, error: '' });
   const [resendTimer, setResendTimer] = useState(0);
+  const [isExistingUser, setIsExistingUser] = useState(false);
 
   useEffect(() => {
     // If already have a Supabase session, keep the user stored
@@ -36,16 +38,34 @@ export default function Login() {
 
   const isValidEmail = (value) => /\S+@\S+\.\S+/.test(value);
 
+  const checkUserExists = async (email) => {
+    const { data, error } = await supabase
+      .from('users')
+      .select('full_name')
+      .eq('email', email)
+      .maybeSingle();
+    
+    if (!error && data) {
+      setForm(prev => ({ ...prev, full_name: data.full_name || '' }));
+      return true;
+    }
+    setStatus({ sending: false, verifying: false, error: 'No account found with this email. Please sign up first.' });
+    return false;
+  };
+
   const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (!form.email || !form.full_name) {
-      setStatus({ sending: false, verifying: false, error: 'Please enter your name and email.' });
+    if (!form.email) {
+      setStatus({ sending: false, verifying: false, error: 'Please enter your email.' });
       return;
     }
     if (!isValidEmail(form.email)) {
       setStatus({ sending: false, verifying: false, error: 'Enter a valid email address.' });
       return;
     }
+    
+    const userExists = await checkUserExists(form.email);
+    if (!userExists) return;
     
     setStatus({ sending: true, verifying: false, error: '' });
     
@@ -97,26 +117,34 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center px-4">
-      <Card className="w-full max-w-md shadow-lg border-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50/30 flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(249,115,22,0.08),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(249,115,22,0.06),transparent_50%)] pointer-events-none" />
+      <div className="absolute top-20 left-10 w-2 h-2 bg-orange-300/40 rounded-full animate-pulse" />
+      <div className="absolute top-32 right-20 w-1 h-1 bg-orange-400/60 rounded-full animate-pulse delay-1000" />
+      <div className="absolute bottom-40 left-1/4 w-1.5 h-1.5 bg-orange-200/50 rounded-full animate-pulse delay-500" />
+      
+      <div className="w-full max-w-md">
+        {/* Beta Header */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg shadow-orange-500/10 border border-orange-100/50 mb-4">
+            <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">S</span>
+            </div>
+            <span className="font-semibold text-slate-900">SharePlate</span>
+            <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">Early Access</span>
+          </div>
+        </div>
+        
+        <Card className="shadow-xl border-slate-100 bg-white/95 backdrop-blur-sm">
         <CardContent className="p-6 space-y-6">
           <div className="space-y-2 text-center">
-            <h1 className="text-2xl font-bold text-slate-900">Sign in</h1>
-            <p className="text-slate-600 text-sm">Use your email to get a one-time code.</p>
+            <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
+            <p className="text-slate-600 text-sm">Sign in to start sharing meals with your community</p>
           </div>
 
           {!otpSent ? (
             <form onSubmit={handleSendOtp} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="full_name">Full name</Label>
-                <Input
-                  id="full_name"
-                  value={form.full_name}
-                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-                  placeholder="Jamie Oliver"
-                  required
-                />
-              </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -129,8 +157,8 @@ export default function Login() {
                 />
               </div>
               {status.error && <p className="text-sm text-red-600">{status.error}</p>}
-              <Button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white" disabled={status.sending}>
-                {status.sending ? 'Sending code...' : 'Send code'}
+              <Button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105" disabled={status.sending}>
+                {status.sending ? 'Sending code...' : 'Send verification code'}
               </Button>
               <p className="text-xs text-slate-500">
                 We’ll send a one-time code to your email. Check spam if you don’t see it within a minute.
@@ -159,8 +187,8 @@ export default function Login() {
                 <Button type="button" variant="outline" className="w-1/3" onClick={() => setOtpSent(false)} disabled={status.verifying}>
                   Edit email
                 </Button>
-                <Button type="submit" className="w-2/3 bg-slate-900 hover:bg-slate-800 text-white" disabled={status.verifying}>
-                  {status.verifying ? 'Verifying...' : 'Verify & continue'}
+                <Button type="submit" className="w-2/3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl" disabled={status.verifying}>
+                  {status.verifying ? 'Verifying...' : 'Continue'}
                 </Button>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-500">
@@ -168,7 +196,7 @@ export default function Login() {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="h-8 px-2 text-amber-600"
+                  className="h-8 px-2 text-orange-600"
                   disabled={resendTimer > 0 || status.sending}
                   onClick={handleSendOtp}
                 >
@@ -186,17 +214,25 @@ export default function Login() {
 
           <div className="text-center text-sm text-slate-600">
             <span className="mr-2">New to SharePlate?</span>
-            <Link to={createPageUrl("Signup")} className="text-amber-600 font-semibold">Create an account</Link>
+            <Link to={createPageUrl("Signup")} className="text-orange-600 font-semibold hover:text-orange-700 transition-colors">Join the beta</Link>
           </div>
 
           <p className="text-xs text-slate-500 text-center">
             By continuing, you agree to our{" "}
-            <Link to={createPageUrl("Policies") + "#terms"} className="text-amber-600 font-semibold hover:underline">Terms</Link>{" "}
+            <Link to={createPageUrl("Policies") + "#terms"} className="text-orange-600 font-semibold hover:underline">Terms</Link>{" "}
             and{" "}
-            <Link to={createPageUrl("Policies") + "#privacy"} className="text-amber-600 font-semibold hover:underline">Privacy Policy</Link>.
+            <Link to={createPageUrl("Policies") + "#privacy"} className="text-orange-600 font-semibold hover:underline">Privacy Policy</Link>.
           </p>
         </CardContent>
       </Card>
+      
+      {/* Beta Footer */}
+      <div className="text-center mt-6">
+        <p className="text-xs text-slate-500">
+          🧪 Early Access • Help us improve by sharing feedback
+        </p>
+      </div>
+      </div>
     </div>
   );
 }

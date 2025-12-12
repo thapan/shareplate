@@ -1,7 +1,7 @@
 const routes = {
   Home: "/",
   CookProfiles: "/cooks",
-  CookProfile: "/cook",
+  CookProfile: "/cooks/:id",
   Messages: "/messages",
   MyMeals: "/my-meals",
   Login: "/login",
@@ -12,4 +12,9 @@ const routes = {
 
 export function createPageUrl(name) {
   return routes[name] || "/";
+}
+
+export function createCookProfileUrl(idOrSlug = "") {
+  if (!idOrSlug) return routes.CookProfiles;
+  return `/cooks/${encodeURIComponent(idOrSlug)}`;
 }

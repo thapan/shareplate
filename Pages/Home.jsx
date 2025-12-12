@@ -39,6 +39,7 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [radiusMiles, setRadiusMiles] = useState(15);
   const [editingMeal, setEditingMeal] = useState(null);
+  const [isPaused, setIsPaused] = useState(false);
   
   const queryClient = useQueryClient();
   const toOptimizedUrl = (bucket, path) => {
@@ -412,13 +413,49 @@ export default function Home() {
       role: "Student",
       location: "Boston, MA",
     },
+    {
+      quote: "My grandmother's biryani recipe brought the whole block together. SharePlate made me the neighborhood favorite!",
+      name: "Aisha M.",
+      role: "Traditional Cook",
+      location: "Chicago, IL",
+    },
+    {
+      quote: "Made too much Korean BBQ for date night. Within an hour, three families came by. Best accident ever!",
+      name: "David L.",
+      role: "Weekend Chef",
+      location: "Portland, OR",
+    },
+    {
+      quote: "My kids love trying different cuisines from neighbors. It's like traveling the world from our doorstep.",
+      name: "Sarah J.",
+      role: "Parent",
+      location: "Denver, CO",
+    },
+    {
+      quote: "Shared my famous mac and cheese during finals week. Students lined up! Felt like feeding my own kids.",
+      name: "Betty R.",
+      role: "Retired Teacher",
+      location: "Ann Arbor, MI",
+    },
+    {
+      quote: "Working late? No problem. Picked up fresh tacos from Maria next door. Better than any restaurant!",
+      name: "Alex C.",
+      role: "Software Engineer",
+      location: "San Francisco, CA",
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fff6ed] via-white to-amber-50/20">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-orange-50/20 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(249,115,22,0.08),transparent_50%),radial-gradient(circle_at_20%_80%,rgba(249,115,22,0.06),transparent_50%)] pointer-events-none" />
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#fff3e0] via-[#fffaf5] to-[#fde7d6]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,183,94,0.18),transparent_40%),radial-gradient(circle_at_75%_15%,rgba(250,204,170,0.18),transparent_35%)]" />
+      <div className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-orange-25 to-orange-100/50 border-b border-orange-100/50">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(249,115,22,0.18),transparent_40%),radial-gradient(circle_at_75%_15%,rgba(249,115,22,0.12),transparent_35%)]" />
+        {/* Floating elements */}
+        <div className="absolute top-20 left-10 w-2 h-2 bg-orange-300/40 rounded-full animate-pulse" />
+        <div className="absolute top-32 right-20 w-1 h-1 bg-orange-400/60 rounded-full animate-pulse delay-1000" />
+        <div className="absolute bottom-40 left-1/4 w-1.5 h-1.5 bg-orange-200/50 rounded-full animate-pulse delay-500" />
         <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1920&q=80&auto=format&fit=crop')] bg-cover bg-center" />
         <div className="relative max-w-6xl mx-auto px-4 py-16 md:py-24">
           <motion.div
@@ -426,33 +463,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-full px-4 py-2 text-sm text-slate-600 mb-4 shadow">
-              <span className="w-7 h-7 inline-flex items-center justify-center rounded-full bg-gradient-to-br from-orange-500 via-amber-400 to-amber-300 shadow ring-2 ring-white/70">
-                <svg width="16" height="16" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                  <defs>
-                    <linearGradient id="miniPlate" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#fff7ed" />
-                      <stop offset="1" stopColor="#fde68a" />
-                    </linearGradient>
-                  </defs>
-                  <circle cx="16" cy="16" r="14" fill="#fff7ed" opacity="0.35" />
-                  <circle cx="16" cy="16" r="10" fill="url(#miniPlate)" stroke="#fef3c7" strokeWidth="1.5" />
-                  <path d="M10 18c0 3.3 2.7 6 6 6s6-2.7 6-6H10Z" fill="#f59e0b" stroke="#f97316" strokeWidth="1.2" />
-                  <path d="M12 15h8" stroke="#f97316" strokeWidth="1.2" strokeLinecap="round" />
-                  <path d="M13 12c0-1 1-.9 1.6-.5.7.4.9 1.4.3 2" stroke="#f43f5e" strokeWidth="1.2" strokeLinecap="round" />
-                  <path d="M16 11.5c0-1 1-.9 1.6-.5.7.4.9 1.4.3 2" stroke="#f43f5e" strokeWidth="1.2" strokeLinecap="round" />
-                </svg>
-              </span>
-              <span>Share homemade meals with your community</span>
-            </div>
+
             <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-3 tracking-tight leading-tight display-font">
               Home cooking,
-              <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent"> shared</span>
-              <div className="flex items-center justify-center gap-3 mt-4">
-                <span className="bg-orange-500 text-white text-sm px-3 py-1 rounded-full font-semibold shadow-lg">
-                  Early Access
-                </span>
-              </div>
+              <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent"> shared</span>
             </h1>
             <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto mb-6">
               Discover homemade meals from local cooks—or share yours—and connect over real food.
@@ -462,7 +476,7 @@ export default function Home() {
               <Button
                 size="lg"
                 onClick={handleOpenCreate}
-                className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-8 h-14 text-base shadow-lg shadow-slate-900/20"
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full px-8 h-14 text-base shadow-lg shadow-orange-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-orange-500/30 hover:scale-105"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Share a Meal
@@ -471,7 +485,7 @@ export default function Home() {
                 size="lg"
                 variant="outline"
                 onClick={() => document.getElementById('meals-section')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-white hover:bg-slate-50 rounded-full px-8 h-14 text-base border-slate-200"
+                className="bg-white/80 backdrop-blur-sm hover:bg-white rounded-full px-8 h-14 text-base border-slate-200/60 shadow-lg shadow-slate-900/5 transition-all duration-200 hover:shadow-xl hover:scale-105"
               >
                 <Utensils className="w-5 h-5 mr-2" />
                 Browse Meals
@@ -492,7 +506,7 @@ export default function Home() {
       </div>
 
       {/* Meals Section */}
-      <div id="meals-section" className="max-w-6xl mx-auto px-4 py-12">
+      <div id="meals-section" className="relative max-w-6xl mx-auto px-4 py-12">
         {/* Search and Filters */}
         <div className="flex flex-col lg:flex-row gap-4 mb-6">
           <div className="relative flex-1">
@@ -501,24 +515,24 @@ export default function Home() {
               placeholder="Search meals, cuisines, or cooks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-xl border-slate-200 bg-white"
+              className="pl-12 h-12 rounded-xl border-slate-200 bg-white shadow-sm focus:shadow-md transition-shadow duration-200"
             />
           </div>
           
           <div className="flex flex-1 gap-3">
             <Tabs value={activeFilter} onValueChange={setActiveFilter}>
-              <TabsList className="h-12 bg-slate-100 rounded-xl p-1">
-                <TabsTrigger value="all" className="rounded-lg px-4">All</TabsTrigger>
-                <TabsTrigger value="today" className="rounded-lg px-4">Today</TabsTrigger>
-                <TabsTrigger value="week" className="rounded-lg px-4">This Week</TabsTrigger>
+              <TabsList className="h-12 bg-slate-100/80 backdrop-blur-sm rounded-xl p-1 shadow-sm">
+                <TabsTrigger value="all" className="rounded-lg px-4 data-[state=active]:bg-white data-[state=active]:shadow-sm">All</TabsTrigger>
+                <TabsTrigger value="today" className="rounded-lg px-4 data-[state=active]:bg-white data-[state=active]:shadow-sm">Today</TabsTrigger>
+                <TabsTrigger value="week" className="rounded-lg px-4 data-[state=active]:bg-white data-[state=active]:shadow-sm">This Week</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
         </div>
 
         <div className="flex items-center gap-3 mb-6 flex-wrap">
-          <Badge variant="outline" className="bg-white border-slate-200 flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-amber-500" />
+          <Badge variant="outline" className="bg-white/80 backdrop-blur-sm border-slate-200 flex items-center gap-2 shadow-sm">
+            <MapPin className="w-4 h-4 text-orange-500" />
             {locationStatus === "ready" && userLocation
               ? `Within ${radiusMiles || 'any'} miles of you`
               : locationStatus === "pending"
@@ -606,7 +620,7 @@ export default function Home() {
             <p className="text-slate-500 mb-6">Be the first to share a homemade meal!</p>
             <Button
               onClick={handleOpenCreate}
-              className="bg-slate-900 hover:bg-slate-800 rounded-full px-6"
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-full px-6"
             >
               <Plus className="w-4 h-4 mr-2" />
               Share a Meal
@@ -615,32 +629,44 @@ export default function Home() {
         )}
       </div>
 
-      {/* Testimonials */}
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-6 md:p-8 overflow-hidden">
-          <div className="flex items-center justify-between mb-4">
+      {/* Testimonials - moving carousel */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="bg-white/85 backdrop-blur-sm border border-orange-100/60 rounded-3xl shadow-xl shadow-orange-200/30 p-6 md:p-8 relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_15%_20%,rgba(249,115,22,0.08),transparent_40%),radial-gradient(circle_at_85%_0%,rgba(234,88,12,0.08),transparent_35%)]" />
+          <div className="flex items-center justify-between gap-4 relative z-10 mb-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-amber-600 font-semibold">Voices from the table</p>
-              <h2 className="text-2xl font-bold text-slate-900">What SharePlate feels like</h2>
+              <p className="text-xs uppercase tracking-[0.25em] text-orange-600 font-semibold">Voices from the table</p>
+              <h2 className="text-3xl font-bold text-slate-900">Real moments from our community</h2>
+              <p className="text-xs text-slate-500 mt-1">*Sample stories for this demo build</p>
+            </div>
+            <div className="hidden md:flex flex-col items-end text-right">
+              <div className="inline-flex items-center gap-2 bg-white/90 border border-orange-100 rounded-full px-3 py-1 shadow-sm">
+                <span className="text-sm font-semibold text-slate-900">4.8</span>
+                <span className="text-xs text-slate-500">avg experience</span>
+              </div>
             </div>
           </div>
-          <div className="relative">
+
+          <div className="relative z-10">
             <div className="absolute inset-y-0 left-0 w-16 pointer-events-none bg-gradient-to-r from-white to-transparent" />
             <div className="absolute inset-y-0 right-0 w-16 pointer-events-none bg-gradient-to-l from-white to-transparent" />
             <motion.div
               className="flex gap-4"
               animate={{ x: ['0%', '-50%'] }}
-              transition={{ repeat: Infinity, duration: 28, ease: "linear" }}
-              style={{ width: 'max-content' }}
+              transition={{ repeat: Infinity, duration: 38, ease: "linear" }}
+              style={{ width: 'max-content', animationPlayState: isPaused ? 'paused' : 'running' }}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
             >
               {[...testimonials, ...testimonials].map((t, idx) => (
                 <div
                   key={idx}
-                  className="min-w-[260px] max-w-[280px] bg-slate-50 border border-slate-100 rounded-2xl p-4 shadow-[0_6px_20px_rgba(0,0,0,0.04)]"
+                  className="min-w-[300px] max-w-[320px] bg-white/90 backdrop-blur-md border border-orange-100/60 rounded-3xl p-6 shadow-[0_10px_40px_rgba(0,0,0,0.08)] hover:shadow-[0_14px_50px_rgba(0,0,0,0.12)] transition-all duration-300 hover:scale-105 relative overflow-hidden"
                 >
-                  <p className="text-slate-800 text-sm leading-relaxed mb-4">“{t.quote}”</p>
-                  <div className="text-sm font-semibold text-slate-900">{t.name}</div>
-                  <div className="text-xs text-slate-500">
+                  <div className="absolute -top-6 -left-4 text-6xl text-orange-100 pointer-events-none">“</div>
+                  <p className="text-slate-800 text-sm leading-relaxed mb-4 relative z-10">“{t.quote}”</p>
+                  <div className="text-sm font-semibold text-slate-900 relative z-10">{t.name}</div>
+                  <div className="text-xs text-slate-500 relative z-10">
                     {t.role} · {t.location}
                   </div>
                 </div>
@@ -652,14 +678,14 @@ export default function Home() {
 
       {/* FAQ Section */}
       <div className="max-w-4xl mx-auto px-4 pb-16">
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-6 md:p-8">
+        <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-2xl shadow-lg shadow-slate-900/5 p-6 md:p-8">
           <h2 className="text-2xl font-bold text-slate-900 mb-4 display-font">FAQs</h2>
           <p className="text-slate-600 mb-6">Quick answers about how SharePlate works.</p>
           <div className="space-y-4">
             {faqs.map((item, idx) => (
               <details
                 key={idx}
-                className="group border border-slate-100 rounded-xl px-4 py-3 bg-slate-50/50"
+                className="group border border-slate-100 rounded-xl px-4 py-3 bg-slate-50/50 hover:bg-slate-50/80 transition-colors duration-200"
               >
                 <summary className="flex items-center justify-between cursor-pointer list-none">
                   <span className="font-semibold text-slate-900">{item.q}</span>
@@ -670,7 +696,7 @@ export default function Home() {
                   {item.link && (
                     <>
                       {" "}
-                      <a href={item.link} className="text-amber-600 font-semibold hover:underline">
+                      <a href={item.link} className="text-orange-600 font-semibold hover:underline">
                         View Policies
                       </a>
                     </>
@@ -680,7 +706,7 @@ export default function Home() {
             ))}
             <div className="text-sm text-slate-600">
               Want the full details?{" "}
-              <a href="/policies" className="text-amber-600 font-semibold hover:underline">
+              <a href="/policies" className="text-orange-600 font-semibold hover:underline">
                 View Policies
               </a>
             </div>

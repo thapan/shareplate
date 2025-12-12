@@ -144,18 +144,22 @@ export default function Messages() {
   const unreadCount = allMessages.filter(m => !m.is_read && m.receiver_email === user.email).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-amber-50/20 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(251,191,36,0.08),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(249,115,22,0.06),transparent_50%)] pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-4 bg-amber-50/70 border border-amber-100 text-amber-800 text-sm px-4 py-2 rounded-full">
+        <div className="mb-4 bg-amber-50/80 backdrop-blur-sm border border-amber-100 text-amber-800 text-sm px-4 py-2 rounded-full shadow-sm">
           Coordinate directly with hosts. This is a community platform—no payments or delivery, and sharing is at your discretion.
         </div>
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <MessageSquare className="w-8 h-8 text-orange-500" />
+            <div className="w-12 h-12 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg shadow-orange-500/20 flex items-center justify-center border border-orange-100/50">
+              <MessageSquare className="w-6 h-6 text-orange-500" />
+            </div>
             <h1 className="text-3xl font-bold text-slate-900">Messages</h1>
             {unreadCount > 0 && (
-              <span className="bg-orange-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
+              <span className="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold px-3 py-1 rounded-full shadow-lg">
                 {unreadCount} new
               </span>
             )}
@@ -166,7 +170,7 @@ export default function Messages() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Conversations List */}
           <div className="lg:col-span-1">
-            <Card className="border-0 shadow-md">
+            <Card className="border-0 shadow-lg shadow-slate-900/5 bg-white/80 backdrop-blur-sm">
               <CardHeader className="border-b border-slate-100">
                 <CardTitle className="text-lg">Conversations</CardTitle>
               </CardHeader>
@@ -174,7 +178,7 @@ export default function Messages() {
                 {isLoading ? (
                   <div className="space-y-3">
                     {[1, 2, 3].map(i => (
-                      <div key={i} className="h-20 bg-slate-100 rounded-lg animate-pulse" />
+                      <div key={i} className="h-20 bg-slate-100/80 rounded-lg animate-pulse" />
                     ))}
                   </div>
                 ) : conversations.length > 0 ? (
@@ -197,7 +201,7 @@ export default function Messages() {
 
           {/* Message Thread */}
           <div className="lg:col-span-2">
-            <Card className="border-0 shadow-md h-[calc(100vh-200px)] flex flex-col">
+            <Card className="border-0 shadow-lg shadow-slate-900/5 bg-white/80 backdrop-blur-sm h-[calc(100vh-200px)] flex flex-col">
               {selectedConversation ? (
                 <>
                   {/* Thread Header */}
@@ -219,7 +223,7 @@ export default function Messages() {
                           className="w-10 h-10 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center shadow-sm">
                           <ChefHat className="w-5 h-5 text-orange-500" />
                         </div>
                       )}
@@ -249,7 +253,9 @@ export default function Messages() {
               ) : (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
-                    <MessageSquare className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <div className="w-20 h-20 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MessageSquare className="w-10 h-10 text-slate-400" />
+                    </div>
                     <p className="text-slate-600 font-medium">Select a conversation</p>
                     <p className="text-slate-400 text-sm mt-1">Choose a conversation to start messaging</p>
                   </div>

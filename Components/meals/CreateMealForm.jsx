@@ -204,7 +204,7 @@ export default function CreateMealForm({ onSubmit, onCancel, isSubmitting, initi
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+      <div className="text-xs text-orange-700 bg-orange-50 border border-orange-100 rounded-lg px-3 py-2">
         Community sharing only—no payments or delivery.{" "}
         <a href="/policies#disclaimer" className="underline font-semibold">See full policies</a>.
       </div>
@@ -382,7 +382,7 @@ export default function CreateMealForm({ onSubmit, onCancel, isSubmitting, initi
               <Badge
                 key={diet}
                 variant={formData.dietary_info.includes(diet) ? "default" : "outline"}
-                className={`cursor-pointer ${formData.dietary_info.includes(diet) ? "bg-slate-900 text-white" : "border-slate-200 text-slate-700"}`}
+                className={`cursor-pointer ${formData.dietary_info.includes(diet) ? "bg-orange-500 text-white" : "border-slate-200 text-slate-700"}`}
                 onClick={() => toggleDietary(diet)}
               >
                 {diet}
@@ -405,7 +405,7 @@ export default function CreateMealForm({ onSubmit, onCancel, isSubmitting, initi
         <Button
           type="submit"
           disabled={isSubmitting || !formData.title}
-          className="flex-1 h-12 bg-slate-900 hover:bg-slate-800 rounded-xl"
+          className="flex-1 h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-xl"
         >
           {isSubmitting ? "Saving..." : initialData ? "Update Meal" : "Share Meal"}
         </Button>

@@ -79,16 +79,22 @@ export default function CookProfiles() {
   const isLoading = loadingMeals || loadingReviews || loadingUsers;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50/50 via-white to-amber-50/30">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50/50 via-white to-amber-50/30 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(251,191,36,0.08),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(249,115,22,0.06),transparent_50%)] pointer-events-none" />
       {/* Header */}
-      <div className="bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-50 border-b border-orange-100">
+      <div className="relative bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-50 border-b border-orange-100/50">
+        {/* Floating elements */}
+        <div className="absolute top-10 left-10 w-2 h-2 bg-orange-300/40 rounded-full animate-pulse" />
+        <div className="absolute top-20 right-20 w-1 h-1 bg-amber-400/60 rounded-full animate-pulse delay-1000" />
+        <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-orange-200/50 rounded-full animate-pulse delay-500" />
         <div className="max-w-6xl mx-auto px-4 py-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-orange-500/20 mb-4 border border-orange-100/50">
               <ChefHat className="w-8 h-8 text-orange-500" />
             </div>
             <h1 className="text-4xl font-bold text-slate-900 mb-3">
@@ -111,7 +117,7 @@ export default function CookProfiles() {
               placeholder="Search cooks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-xl border-slate-200 bg-white"
+              className="pl-12 h-12 rounded-xl border-slate-200 bg-white/80 backdrop-blur-sm shadow-sm focus:shadow-md transition-shadow duration-200"
             />
           </div>
         </div>
@@ -120,7 +126,7 @@ export default function CookProfiles() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white rounded-2xl h-32 animate-pulse" />
+              <div key={i} className="bg-white/80 backdrop-blur-sm rounded-2xl h-32 animate-pulse shadow-sm" />
             ))}
           </div>
         ) : filteredCooks.length > 0 ? (
@@ -149,7 +155,9 @@ export default function CookProfiles() {
           </motion.div>
         ) : (
           <div className="text-center py-20">
-            <ChefHat className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <div className="w-20 h-20 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
+              <ChefHat className="w-10 h-10 text-slate-400" />
+            </div>
             <h3 className="text-xl font-semibold text-slate-900 mb-2">No cooks found</h3>
             <p className="text-slate-500">Try adjusting your search</p>
           </div>

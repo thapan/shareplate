@@ -214,7 +214,7 @@ export default function MealDetailsModal({ meal, open, onClose, onRequestMeal, c
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-slate-900">About this meal</h3>
                   <p className="text-sm text-slate-700 leading-relaxed">{meal.description || "No description provided."}</p>
-                  <div className="text-[12px] text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                  <div className="text-[12px] text-orange-800 bg-orange-50 border border-orange-100 rounded-lg px-3 py-2">
                     Free sharing only—no payments or delivery.{" "}
                     <a href={createPageUrl("Policies") + "#disclaimer"} className="underline font-semibold">See policies</a>.
                   </div>
@@ -251,7 +251,7 @@ export default function MealDetailsModal({ meal, open, onClose, onRequestMeal, c
                     onClose();
                     onRequestMeal(meal);
                   }}
-                  className="w-full h-11 bg-slate-900 hover:bg-slate-800 rounded-xl"
+                  className="w-full h-11 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-xl"
                 >
                   Request a Portion
                 </Button>
@@ -305,7 +305,7 @@ export default function MealDetailsModal({ meal, open, onClose, onRequestMeal, c
                         />
                       ) : (
                         <Button
-                          className="w-full bg-slate-900 hover:bg-slate-800 rounded-xl"
+                          className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-xl"
                           onClick={() => setShowReviewForm(true)}
                         >
                           Leave a Review
@@ -316,7 +316,7 @@ export default function MealDetailsModal({ meal, open, onClose, onRequestMeal, c
 
                   {!currentUserEmail && (
                     <div className="text-sm text-slate-600 text-center">
-                      <a href={createPageUrl("Login")} className="text-amber-600 font-semibold hover:underline">
+                      <a href={createPageUrl("Login")} className="text-orange-600 font-semibold hover:underline">
                         Sign in to leave a review
                       </a>
                     </div>
