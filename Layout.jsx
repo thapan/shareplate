@@ -342,7 +342,7 @@ export default function Layout({ children }) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-50 border-t border-slate-100 py-8">
+      <footer className="bg-slate-50 border-t border-slate-100 py-4">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
@@ -351,10 +351,10 @@ export default function Layout({ children }) {
             <span className="font-semibold text-slate-900">SharePlate</span>
           </div>
           <p className="text-sm text-slate-500">
-            Community platform for free sharing. No payments or delivery. Participation is at your discretion and we are not responsible for food safety.
-            {" "}
+            Free community sharing—no payments or delivery. Participation is at your discretion; SharePlate isn’t responsible for food safety.{" "}
             <Link to={createPageUrl("Policies")} className="text-amber-600 font-semibold hover:underline">Policies</Link>
           </p>
+          <p className="text-xs text-slate-400 mt-2">© 2025 SharePlate</p>
         </div>
       </footer>
     </div>

@@ -373,7 +373,7 @@ export default function Policies() {
         </main>
 
         <footer className="text-center text-sm text-[#666] mt-6">
-          SharePlate is a free community food-sharing platform. Participation is voluntary and at your own risk.
+          SharePlate™ is a free community food-sharing platform. Participation is voluntary and at your own risk. © 2025 SharePlate™.
         </footer>
       </div>
     </div>
