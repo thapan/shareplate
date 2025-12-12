@@ -144,11 +144,11 @@ export default function Messages() {
   const unreadCount = allMessages.filter(m => !m.is_read && m.receiver_email === user.email).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50/30 via-white to-amber-50/20 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-orange-50/20 relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(251,191,36,0.08),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(249,115,22,0.06),transparent_50%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(249,115,22,0.08),transparent_50%),radial-gradient(circle_at_20%_80%,rgba(249,115,22,0.06),transparent_50%)] pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-4 bg-amber-50/80 backdrop-blur-sm border border-amber-100 text-amber-800 text-sm px-4 py-2 rounded-full shadow-sm">
+        <div className="mb-4 bg-orange-50/80 backdrop-blur-sm border border-orange-100 text-orange-800 text-sm px-4 py-2 rounded-full shadow-sm">
           Coordinate directly with hosts. This is a community platform—no payments or delivery, and sharing is at your discretion.
         </div>
         {/* Header */}
@@ -159,7 +159,7 @@ export default function Messages() {
             </div>
             <h1 className="text-3xl font-bold text-slate-900">Messages</h1>
             {unreadCount > 0 && (
-              <span className="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold px-3 py-1 rounded-full shadow-lg">
+              <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-sm font-semibold px-3 py-1 rounded-full shadow-lg">
                 {unreadCount} new
               </span>
             )}
@@ -223,7 +223,7 @@ export default function Messages() {
                           className="w-10 h-10 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center shadow-sm">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center shadow-sm">
                           <ChefHat className="w-5 h-5 text-orange-500" />
                         </div>
                       )}

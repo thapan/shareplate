@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
@@ -330,6 +330,11 @@ export default function Home() {
   };
 
   const filteredMeals = meals.filter(meal => {
+    // Filter out expired meals
+    const now = new Date();
+    const mealDateTime = new Date(`${meal.date}T${meal.time || '23:59'}`);
+    if (mealDateTime < now) return false;
+
     const matchesSearch = meal.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          meal.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          meal.cook_name?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -696,9 +701,9 @@ export default function Home() {
                   {item.link && (
                     <>
                       {" "}
-                      <a href={item.link} className="text-orange-600 font-semibold hover:underline">
+                      <Link to={item.link} className="text-orange-600 font-semibold hover:underline">
                         View Policies
-                      </a>
+                      </Link>
                     </>
                   )}
                 </p>
@@ -706,9 +711,9 @@ export default function Home() {
             ))}
             <div className="text-sm text-slate-600">
               Want the full details?{" "}
-              <a href="/policies" className="text-orange-600 font-semibold hover:underline">
+              <Link to={createPageUrl("Policies")} className="text-orange-600 font-semibold hover:underline">
                 View Policies
-              </a>
+              </Link>
             </div>
           </div>
         </div>

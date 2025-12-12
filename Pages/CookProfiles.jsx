@@ -79,15 +79,15 @@ export default function CookProfiles() {
   const isLoading = loadingMeals || loadingReviews || loadingUsers;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50/50 via-white to-amber-50/30 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-orange-50/20 relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(251,191,36,0.08),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(249,115,22,0.06),transparent_50%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(249,115,22,0.08),transparent_50%),radial-gradient(circle_at_20%_80%,rgba(249,115,22,0.06),transparent_50%)] pointer-events-none" />
       {/* Header */}
-      <div className="relative bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-50 border-b border-orange-100/50">
+      <div className="relative bg-gradient-to-br from-orange-50 via-orange-25 to-orange-100/50 border-b border-orange-100/50">
         {/* Floating elements */}
-        <div className="absolute top-10 left-10 w-2 h-2 bg-orange-300/40 rounded-full animate-pulse" />
-        <div className="absolute top-20 right-20 w-1 h-1 bg-amber-400/60 rounded-full animate-pulse delay-1000" />
-        <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-orange-200/50 rounded-full animate-pulse delay-500" />
+        <div className="absolute top-20 left-10 w-2 h-2 bg-orange-300/40 rounded-full animate-pulse" />
+        <div className="absolute top-32 right-20 w-1 h-1 bg-orange-400/60 rounded-full animate-pulse delay-1000" />
+        <div className="absolute bottom-40 left-1/4 w-1.5 h-1.5 bg-orange-200/50 rounded-full animate-pulse delay-500" />
         <div className="max-w-6xl mx-auto px-4 py-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
